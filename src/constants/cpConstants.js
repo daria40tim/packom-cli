@@ -1,0 +1,3 @@
+export const CP_LIST_REQUEST = 'CP_LIST_REQUEST'
+export const CP_LIST_SUCCESS = 'CP_LIST_SUCCESS'
+export const CP_LIST_FAIL = 'CP_LIST_FAIL'

@@ -1,0 +1,88 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.filter {
+width: 10vw;
+margin-top: 10vh;
+position: sticky;
+left: 0;
+top:12vh;
+overflow: auto;
+}
+
+
+.navigator{
+  width: 100vw;
+  height: 10vh;
+  margin-top: 0;
+  max-height: 11vh;
+  min-height: 9vh;
+  z-index: 99;
+  position: fixed;
+  background-color: #1193c6;
+}
+
+nav{
+  height: 10vh;
+}
+
+/*.org_head{
+  z-index: 98;
+  position: sticky;
+  position: -webkit-sticky;
+  height: 15vh;
+  top: 10vh;
+  margin-top: 10vh;
+  max-height: 15vh;
+  min-height: 15vh;
+  margin-left: 15vw;
+}
+
+#org_body{
+  margin-top: 20vh;
+  scroll-padding-top: 20vh;
+  margin-left: 15vw;
+}*/
+
+.org_head *{
+  position: -webkit-sticky;
+  position: sticky;
+  top: 10vh;
+  z-index: 2;
+  background-color: #858580;
+}
+
+#org_table{
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+
+.main_t{
+  margin-top: 10vh;
+}
+
+.one_item{
+  margin-top: 5vh;
+  z-index: 1;
+}
+
+.loading{
+  z-index: 1;
+}
+
+.cr_input{
+  width: 100%;
+  min-height: fit-content;
+}
