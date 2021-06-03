@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
 import { listTechDetails } from '../actions/tzAction';
@@ -61,15 +61,30 @@ const Tec = ({match}) => {
   const tzDetails = useSelector(state => state.tzDetails)
   const {loading, error, tech} = tzDetails
 
+  const [cal, setCal] = useState([])
+  let last = 0
+
+
   useEffect(() => {
     dispatch(listTechDetails(match.params.tz_id))
   }, [dispatch, match])
 
+  useEffect(() => {
+    setCal(tech.cal)
+})
   
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
 
+  Date.prototype.getWeek = function() {
+    var date = new Date(this.getTime());
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+    var week1 = new Date(date.getFullYear(), 0, 4);
+    return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  }
+
     let onClickAdd = (e) => {
-     console.log("1")
+      history.push(`/cps/create/${match.params.tz_id}`)
     }
     let onClickUpdate = (e) => {
       history.push(`/techs/upd/${match.params.tz_id}`)
@@ -190,18 +205,18 @@ const Tec = ({match}) => {
       </tr>
     </thead>
     <tbody>
-      {tech.cal ? tech.cal.map((item, i)=>{
+      {cal ? cal.map((item, i)=>{ last = last + item.period
         return (
       <tr>
         <td>{item.task_name}</td>
         <td>{item.period}</td>
-        <td>{item.term}</td>
+        <td>{new Date(tech.end_date).getWeek() + last}</td>
       </tr>)}): <p>Заказчик не добавил календарный план</p>}
     </tbody>
   </table>
 
   <h5 className="text-justify">История изменений</h5>
-  <p className="text-justify">{tech.history}</p>
+  <textarea className='cr_area' value={tech.history} rows="5"></textarea>
 </div>
 </div>
 )

@@ -1,8 +1,8 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
-import { createCP, listCPDetails } from '../actions/cpAction';
-import { createTZ, listTechDetails } from '../actions/tzAction';
+import { listCPDetails, cpUpdate, cpDeleteCal, cpDeleteCst } from '../actions/cpAction';
+import { cpDeleteCalReducer, cpDeleteCstReducer } from '../reducers/cpReducers';
 
 
 Date.prototype.getWeek = function() {
@@ -24,62 +24,97 @@ const One_CP = ({match}) =>  {
   let c = []
   let ca = []
 
+  const history = useHistory()
+
   const dispatch = useDispatch()
 
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
 
-  const tzDetails = useSelector(state => state.tzDetails)
-  const {loading, error, tech} = tzDetails
-  const date = new Date().toISOString().slice(0, 10)
+  const cpDetails = useSelector(state => state.cpDetails)
+  const {loading, error, cp} = cpDetails
 
   useEffect(() => {
-    dispatch(listTechDetails(match.params.tz_id))
-  }, [dispatch])
+    dispatch(listCPDetails(match.params.cp_id))
+  }, [dispatch, match])
 
-const onClickCst = (e) => {
-    tech.cst.forEach(element => {
-        c.push({
-            task: element.task,
-            ppu: 0,
-            info: ''
-        })
-    });
-    for (let index = 0; index < c.length; index++) {
-        c[index].ppu = document.getElementById(index).value
-        document.getElementById(index).setAttribute('disabled', true)
+    const onClickDocs = (e) => {
+
     }
-    for (let index = 0; index < c.length; index++) {
-        c[index].info = document.getElementById(index+100000).value
-        document.getElementById(index+100000).setAttribute('disabled', true)
+
+    const onClickCst = (e) => {
+        cp.tz_costs.forEach(element => {
+            c.push({
+                task: element.task,
+                ppu: element.ppu,
+                info: ''
+            })
+        });
+        for (let index = 0; index < c.length; index++) {
+            if (document.getElementById(index).value != ''){ 
+            c[index].ppu = document.getElementById(index).value}
+            document.getElementById(index).setAttribute('disabled', true)
+        }
+        for (let index = 0; index < c.length; index++) {
+            if (document.getElementById(index+100000).value != ''){
+            c[index].info = document.getElementById(index+100000).value}
+            document.getElementById(index+100000).setAttribute('disabled', true)
+        }
+        setCst([...c])
+        document.getElementById(e.target.id).setAttribute('disabled', true)
+        dispatch(cpDeleteCst(match.params.cp_id))
+        console.log(c[0].ppu)
+
     }
-    setCst([...c])
-    document.getElementById(e.target.id).setAttribute('disabled', true)
-    console.log(c[0].ppu)
-}
 
-const onClickCal = (e) => {
-    tech.cal.forEach(element => {
-        ca.push({
-            task_name: element.task_name,
-            period: 0,
-            term: 0
-        })
-    });
-    for (let index = 0; index < ca.length; index++) {
-        ca[index].period = parseInt(document.getElementById(index+200000).value)
-        document.getElementById(index+200000).setAttribute('disabled', true)
+    const onClickCal = (e) => {
+        cp.tz_calendars.forEach(element => {
+            ca.push({
+                task_name: element.task_name,
+                period: element.period,
+                term: 0
+            })
+        });
+        for (let index = 0; index < ca.length; index++) {
+            if (document.getElementById(index+200000).value != ''){ 
+            ca[index].period = parseInt(document.getElementById(index+200000).value)}
+            document.getElementById(index+200000).setAttribute('disabled', true)
+        }
+        setCal([...ca])
+        document.getElementById(e.target.id).setAttribute('disabled', true)
+        
+        dispatch(cpDeleteCal(match.params.cp_id))
+        
+        console.log(ca[0].task_name)
+
     }
-    setCal([...ca])
-    document.getElementById(e.target.id).setAttribute('disabled', true)
-    console.log(ca[0].task_name)
-}
+    const onClickAccept = (e) => {
+        let hi = ''
+        let pay_cond_ = ''
+        if (pay_cond != ''){ 
+            pay_cond_ = pay_cond
+            hi = hi + " \n Изменены условия оплаты: " + pay_cond_
+        }else {
+            pay_cond_ = cp.pay_cond
+        }
+        let end_date_ = ''
+        if (end_date != ''){ 
+            end_date_ = end_date
+            hi = hi + " \n Изменена конечная дата: " + end_date_
+        }else {
+            end_date_ = cp.end_date
+        }
+        let info_ = ''
+        if (info != ''){ 
+            info_ = info
+            hi = hi + " \n Изменена общая информация: " + info_
+        }else {
+            info_ = cp.info
+        }
 
-const history = useHistory()
+        dispatch(cpUpdate(parseInt(match.params.cp_id), pay_cond_, end_date_, info_, cal, cst, [], hi+cp.history))
+        history.push('/commertial/')
+    }
 
-const onClickAccept = (e) => {
-    dispatch(createCP(parseInt(match.params.tz_id), pay_cond, end_date, info, cal, cst, date, [], tech.proj))
-    history.push('/commertial')
-}
 
     return(
         <div>
@@ -102,58 +137,58 @@ const onClickAccept = (e) => {
             <tr>
               <td scope="col">Клиент</td>
               <td scope="col">
-              <Link to={`/orgs/link/${tech.o_id}`} >
-                  {tech.client}
+              <Link to={`/orgs/link/${cp.tz_o_id}`} >
+                  {cp.client}
                 </Link>
                   </td>
             </tr>
             <tr>
               <td scope="col">Проект</td>
-              <td scope="col">{tech.proj}</td>
+              <td scope="col">{cp.proj}</td>
             </tr>
             <tr>
               <td scope="col">Группа упаковки</td>
-              <td scope="col">{tech.group}</td>
+              <td scope="col">{cp.group}</td>
             </tr>
             <tr>
               <td scope="col">Тип упаковки</td>
-              <td scope="col">{tech.type}</td>
+              <td scope="col">{cp.type}</td>
             </tr>
             <tr>
               <td scope="col">Вид упаковки</td>
-              <td scope="col">{tech.kind}</td>
+              <td scope="col">{cp.kind}</td>
             </tr>
             <tr>
               <td scope="col">Вид задания</td>
-              <td scope="col">{tech.task}</td>
+              <td scope="col">{cp.task_name}</td>
             </tr>
             <tr>
               <td scope="col">Условия оплаты</td>
-              <td scope="col">{tech.pay_cond}</td>
+              <td scope="col">{cp.tz_pay_cond}</td>
             </tr>
             <tr>
               <td scope="col">Дата начала сбора КП</td>
-              <td scope="col">{tech.date}</td>
+              <td scope="col">{cp.tz_date}</td>
             </tr>
             <tr>
               <td scope="col">Дата завершения сбора КП</td>
-              <td scope="col">{tech.end_date}</td>
+              <td scope="col">{cp.tz_end_date}</td>
             </tr>
             <tr>
               <td scope="col">Доступ к данным ТЗ</td>
-              <td scope="col">{tech.privacy=="false" ? 'Общий' : 'Закрытый'}</td>
+              <td scope="col">{cp.privacy}</td>
             </tr>
             <tr>
               <td scope="col">Номер ТЗ</td>
               <td scope="col">
-              <Link to={`/techs/link/${tech.tz_id}`} >
-                  {tech.tz_id}
+              <Link to={`/techs/link/${cp.tz_id}`} >
+                  {cp.tz_id}
                   </Link>
                   </td>
             </tr>
             <tr>
               <td scope="col">Статус ТЗ</td>
-              <td scope="col">{Date.parse(tech.end_date)> Date.now() ? 'Активно' : 'Архив'}</td>
+              <td scope="col">{Date.parse(cp.tz_end_date)> Date.now() ? 'Активно' : 'Архив'}</td>
             </tr>
             <tr>
               <td scope="col" colSpan="2">
@@ -161,7 +196,7 @@ const onClickAccept = (e) => {
             </td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2">{tech.info}</td>
+              <td scope="col" colSpan="2">{cp.tz_info}</td>
             </tr>
             <tr>
               <td scope="col" colSpan="2">
@@ -169,7 +204,7 @@ const onClickAccept = (e) => {
                   </td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2">{tech.docs ? tech.docs.map((item, i)=>{
+              <td scope="col" colSpan="2">{cp.tz_docs ? cp.tz_docs.map((item, i)=>{
         return (
           <p className="text-justify">{item}</p>
        )}) : <p className="text-justify">Документов нет</p>}
@@ -194,45 +229,54 @@ const onClickAccept = (e) => {
             <tr>
               <td scope="col">Поставщик</td>
               <td scope="col">
-              <Link to={`/orgs/link/${userInfo.o_id}`} >
-                  {userInfo.name}
+              <Link to={`/orgs/link/${cp.o_id}`} >
+                  {cp.org}
                 </Link>
             </td>
             </tr>
             <tr>
               <td scope="col">Условия оплаты</td>
-              <td scope="col"><input className='cr_input' name='pay_cond' value={pay_cond} onChange={(e)=>setPay_cond(e.target.value)}></input></td>
+              <td scope="col"><input className='cr_input' name='pay_cond' value={pay_cond} onChange={(e)=>setPay_cond(e.target.value)} placeholder={cp.pay_cond}></input></td>
             </tr>
             <tr>
               <td scope="col">Дата предоставления КП</td>
-              <td scope="col">{date}</td>
+              <td scope="col">{cp.date}</td>
             </tr>
             <tr>
               <td scope="col">Срок действия КП</td>
-              <td scope="col"><input className='cr_input' name='pay_cond' value={end_date} onChange={(e)=>setEnd_date(e.target.value)} placeholder='ГГГГ-ММ-ДД'></input></td>
+              <td scope="col"><input className='cr_input' name='pay_cond' value={end_date} onChange={(e)=>setEnd_date(e.target.value)} placeholder={cp.end_date}></input></td>
             </tr>
             <tr>
               <td scope="col">Статус КП</td>
-              <td scope="col">Активно</td>
+              <td scope="col">{Date.parse(cp.end_date)> Date.now() ? 'Активно' : 'Архив'}</td>
             </tr>
             <tr>
               <td scope="col" colSpan="2"><h5>Описание работ от поставщика</h5></td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2"><input className='cr_input' name='pay_cond' value={info} onChange={(e)=>setInfo(e.target.value)}></input></td>
+            <td scope="col" colSpan="2"><input className='cr_input' name='pay_cond' value={info} onChange={(e)=>setInfo(e.target.value)} placeholder={cp.info}></input></td>
+            </tr>
+            <tr>
+              <td scope="col" colSpan="2"><h5>Документация от поставщика</h5></td>
+            </tr>
+            <tr>
+              <td scope="col" colSpan="2">{cp.docs ? cp.docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify">Документов нет</p>}
+       </td>
             </tr>
           </tbody>
         </table>
+        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> :
         </td>
         </tr>
         </tbody>
         </table>
         </div>
-         
-          <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Добавить документ</button>
+        
 
-
-          <h5 className="text-justify">Разбивка стоимости</h5>
+        <h5 className="text-justify">Разбивка стоимости</h5>
           <table className="w-100">
                 <thead></thead>
                 <tbody>
@@ -248,7 +292,7 @@ const onClickAccept = (e) => {
       </tr>
     </thead>
     <tbody>
-      {tech.cst ? tech.cst.map((item, i)=>{
+      {cp.tz_costs ? cp.tz_costs.map((item, i)=>{
         return (
       <tr>
         <td>{item.task}</td>
@@ -271,21 +315,12 @@ const onClickAccept = (e) => {
         </tr>
     </thead>
     <tbody>
-    {tech.cst ? c.length>0 ? c.map((item, i)=>{
+{cp.tz_costs ? cp.tz_costs.map((item, i)=>{
         return (
       <tr>
-        <td>{c.ppu}</td>
+        <td><input className='cr_input' name='pay_cond' id={i} placeholder={item.ppu}></input></td>
         <td></td>
-        <td>{c.info}</td>
-
-      </tr>)}) :
-    
-    tech.cst.map((item, i)=>{
-        return (
-      <tr>
-        <td><input className='cr_input' name='pay_cond' id={i}></input></td>
-        <td></td>
-        <td><input className='cr_input' name='pay_cond' id={i+100000}></input></td>
+        <td><input className='cr_input' name='pay_cond' id={i+100000} placeholder={item.info}></input></td>
 
       </tr>)}): <p>Разбивка стоимости заказчиком не указана</p>}
     </tbody>
@@ -295,7 +330,7 @@ const onClickAccept = (e) => {
 </tbody>
 </table>
 
-{ tech.cst ? <button type="button" id='ac_btn' className="btn btn-outline-dark" onClick={onClickCst}>Сохранить</button> : <div></div>}
+<button type="button" id='ac_btn' className="btn btn-outline-dark" onClick={onClickCst}>Сохранить</button>
 
 
   <h5 className="text-justify">График выполнения работ</h5>
@@ -317,12 +352,12 @@ const onClickAccept = (e) => {
       </tr>
     </thead>
     <tbody>
-      {tech.cal ? tech.cal.map((item, i)=>{ tz_last = tz_last + item.period
+      {cp.tz_calendars ? cp.tz_calendars.map((item, i)=>{ tz_last = tz_last + item.period
         return (
       <tr>
         <td>{item.task_name}</td>
         <td>{item.period}</td>
-        <td>{new Date(tech.end_date).getWeek() + tz_last}</td>
+        <td>{new Date(cp.end_date).getWeek() + tz_last}</td>
       </tr>)}) : <p>План работ заказчиком не указан</p>}
     </tbody>
   </table> 
@@ -339,20 +374,22 @@ const onClickAccept = (e) => {
       </tr>
     </thead>
     <tbody>
-      {tech.cal ? tech.cal.map((item, i)=>{ last = last + item.period
+      {cp.tz_calendars ? cp.tz_calendars.map((item, i)=>{ last = last + item.period
         return (
       <tr>
-        <td><input className='cr_input' id={i+200000} name='pay_cond'></input></td>
+        <td><input className='cr_input' id={i+200000} name='pay_cond' placeholder={item.period}></input></td>
         <td></td>
       </tr>)}) : <p></p> }
     </tbody>
   </table> 
-  
+  <button type="button" className="btn btn-outline-dark" id='sm_btn' onClick={onClickCal}>Сохранить</button>
   </td>
 </tr>
 </tbody>
 </table>
-<button type="button" className="btn btn-outline-dark" id='sm_btn' onClick={onClickCal}>Сохранить</button>
+
+  <h5 className="text-justify">История изменений</h5>
+  <textarea className='cr_area' value={cp.history} rows="5"></textarea>
 </div>
 <button type="button" className="btn btn-outline-dark" onClick={onClickAccept}>Подтвердить</button>
 </div>
@@ -360,5 +397,5 @@ const onClickAccept = (e) => {
   }
 
 
-const CP_New =withRouter(One_CP) 
-export default CP_New;
+const CP_Upd =withRouter(One_CP) 
+export default CP_Upd;

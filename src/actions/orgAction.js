@@ -139,11 +139,11 @@ export const listOrgAdd = (id) => async(dispatch) => {
       mode: 'cors'
   }
 
-    const { data } = await axios.put(`http://127.0.0.1:8000/api/orgs/${id}`, config)
+    const { data } = await axios.put(`http://127.0.0.1:8000/api/orgs/${id}`,{}, config)
 
     dispatch({
       type: ADD_ORG_SUCCESS,
-      payload: data
+      payload: true
     })
   } catch (error) {
     dispatch({

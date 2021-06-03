@@ -137,7 +137,10 @@ const Or = ({match}) => {
         {userInfo.o_id == match.params.o_id ? <button type="button" className="btn btn-outline-dark">
           <Link className="nav-link " to={`/orgs/upd/${userInfo.o_id}`}>Изменить данные</Link>
           </button>
-         : <button type="button" className="btn btn-outline-dark" onClick={onClick}>Добавить в список поставщиков</button>}
+         : org.group=="Поставщик" || org.group=="Клиент, поставщик"  ?
+         <button type="button" className="btn btn-outline-dark" onClick={onClick}>Добавить в список поставщиков</button>
+        : <div></div>
+        }
           <h5 id="name" className="text-justify">Документация</h5>
           {org.docs ? org.docs.map((item, i)=>{
         return (

@@ -1,5 +1,8 @@
-import React, { Component } from 'react';
-import {Link} from 'react-router-dom';
+import React, { Component, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {Link, withRouter} from 'react-router-dom';
+import { listTenders } from '../actions/tenderAction';
+import Message from './Message';
 
 let specs = ['Уп. материалы', 'Металлоконтейнеры']
 let data = [
@@ -22,8 +25,8 @@ let data = [
 ]
 let stats = ['Сбор КП', 'Требуется решение', 'Принято', 'Отменено']
 
-class Tenders extends Component {
-  constructor(props) {
+const Tender = () => {
+  /*constructor(props) {
     super(props);
         this.state = {
           data: this.props.data, 
@@ -175,7 +178,17 @@ class Tenders extends Component {
     this.forceUpdate()
   }
 
-  render() {
+  render() {*/
+
+    const dispatch = useDispatch()
+
+    const tenderList = useSelector(state => state.tenderList)
+    
+    
+  
+    useEffect(() => {dispatch(listTenders())}, [dispatch])
+    const {loading, error, tenders} = tenderList
+
     return(
       <div>
         <table className="main_table">
@@ -258,28 +271,19 @@ class Tenders extends Component {
 </td>
 
 
-      <td align='justify' valign="top">
+      <td align='justify' valign="top"  width="150%">
       <div className="main_t">
     <table className="table" id="org_table">
     <thead>
       <tr className="org_head">
         <th scope="col">
           <p>Номер решения</p>
-          <button onClick={this.onClickId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d={this.state.tender_idFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
-</svg></button>
           </th>
         <th scope="col">
           <p>Номер ТЗ</p>
-          <button onClick={this.onClickTZId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d={this.state.tz_idFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
-</svg></button>
           </th>
           <th scope="col">
           <p>Дата решения</p>
-          <button onClick={this.onClickDate} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d={this.state.dateFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
-</svg></button>
           </th>
           <th scope="col">
           <p>Проект</p>
@@ -288,29 +292,21 @@ class Tenders extends Component {
         <th scope="col">Тип упаковки</th>
         <th scope="col">Вид упаковки</th>
         <th scope="col">Вид задания</th>
-        <th scope="col">Кол-во КП</th>
-        <th scope="col">Мин. цена за ед.</th>
-        <th scope="col">Макс. цена за ед.</th>
-        <th scope="col">Выбранное КП</th>
-        <th scope="col">Сумма заказа без НДС</th>
         <th scope="col">
           <p>Статус тендера</p>
-          <button onClick={this.onClickTenderSt} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d={this.state.tender_stFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
-</svg></button>
           </th>
       </tr>
     </thead>
     <tbody>
-      {data.map((item, i)=>{
+      {tenders ? tenders.map((item, i)=>{
         return (
       <tr>
         <td>
-          <Link to={`/tenders/link/${item.id}`} >
+          <Link to={`/tenders/link/${item.tender_id}`} >
             {item.tender_id}
           </Link>
         </td>
-        <td><Link to={`/tech/link/${item.tz_id}`} >
+        <td><Link to={`/techs/link/${item.tz_id}`} >
             {item.tz_id}
           </Link></td>
         <td>{item.date}</td>
@@ -319,13 +315,8 @@ class Tenders extends Component {
         <td>{item.type}</td>
         <td>{item.kind}</td>
         <td>{item.task}</td>
-        <td>{item.count}</td>
-        <td>{item.min_price}</td>
-        <td>{item.max_price}</td>
-        <td>{item.checked}</td>
-        <td>{item.sum}</td>
-        <td>{item.tender_st}</td>
-      </tr>)})}
+        <td>{Date.parse(item.end_date) - Date.now() > 0 ? 'Требуется решение' : 'Сбор КП' }</td>
+      </tr>)}): <Message>У вас еще нет тендерных решений</Message>}
     </tbody>
   </table> 
 </div>
@@ -335,6 +326,6 @@ class Tenders extends Component {
 </div>
 )
   }
-}
 
-export default Tenders;
+  const Tenders =withRouter(Tender) 
+  export default Tenders;

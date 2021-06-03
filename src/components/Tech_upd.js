@@ -79,12 +79,11 @@ const Tec_upd = ({match}) => {
 
     }
     const onClickCalendars = () => {
-      setLast(parseInt(last) + parseInt(period) +parseInt(tech.cal[tech.cal.length -1].period))
       let calendars = [...calendar]
       calendars.push({
         task_name: taskCal, 
         period: parseInt(period), 
-        term: parseInt(new Date(end_date).getWeek()) + parseInt(period) + parseInt(last)
+        term: 0
       })
       setCalendar(calendars)
     }
@@ -148,7 +147,7 @@ const Tec_upd = ({match}) => {
             info_ = tech.info
         }
 
-        dispatch(tzUpdate(parseInt(match.params.tz_id), proj_, group_, type_, kind_, task_, pay_cond_, end_date_, info_, calendar, cost, tech.history+hi))
+        dispatch(tzUpdate(parseInt(match.params.tz_id), proj_, group_, type_, kind_, task_, pay_cond_, end_date_, info_, calendar, cost, hi+tech.history))
         history.push('/tech/')
     }
 
@@ -175,7 +174,6 @@ const Tec_upd = ({match}) => {
         document.getElementById(e.target.id).innerHTML = 'Удалено'
         document.getElementById(e.target.id).setAttribute('disabled', true)
     }
-   
      
     return(
         <div>
@@ -356,13 +354,12 @@ const Tec_upd = ({match}) => {
     <thead>
       <tr className="org_head">
         <th scope="col">Наименование работ</th>
-        <th scope="col" colSpan="2">Требования клиента</th>
+        <th scope="col">Требования клиента</th>
         <th scope="col"></th>
       </tr>
       <tr className="org_head">
         <th scope="col"></th>
         <th scope="col">Период, КН</th>
-        <th scope="col">Срок</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -372,7 +369,6 @@ const Tec_upd = ({match}) => {
           <tr>
             <td>{item.task_name}</td>
             <td>{item.period}</td>
-            <td>{item.term}</td>
             <td> <button type="button" className="btn btn-outline-dark" onClick={onClickCalDel} id={100000+i}>Удалить</button></td>
           </tr>
         )}) : <a></a>
@@ -382,8 +378,6 @@ const Tec_upd = ({match}) => {
           <tr>
             <td>{item.task_name}</td>
             <td>{item.period}</td>
-            <td>{end_date ? parseInt(new Date(end_date).getWeek()) + parseInt(period) : parseInt(new Date(tech.end_date).getWeek()) + parseInt(period)}</td>
-            <td></td>
           </tr>
         )}) : <a></a>
       }
@@ -398,7 +392,6 @@ const Tec_upd = ({match}) => {
               <input className='cr_input' name='task_name' value={taskCal} onChange={(e)=>setTaskCal(e.target.value)}></input>
         </td>
         <td><input className='cr_input' name='pay_cond' value={period} onChange={(e)=>setPeriod(e.target.value)}></input></td>
-        <td>{parseInt(new Date(end_date).getWeek())+parseInt(period)+ parseInt(last)}</td>
     
 
         <td colSpan="3"><button type="button" className="btn btn-outline-dark" onClick={onClickCalendars}>Добавить</button></td>

@@ -11,11 +11,13 @@ import Tenders from './components/Tenders';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Tech from './components/Tech';
-import One_CP from './components/One_CP';
+import CP_New from './components/CP_new';
 import Tender from './components/Tender';
 import Org_upd from './components/Org_upd';
 import Tech_new from './components/Tech_new';
 import Tech_upd from './components/Tech_upd';
+import CP_One from './components/CP_one';
+import CP_Upd from './components/CP_upd';
 
 const  App = () => {
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
@@ -47,7 +49,7 @@ const  App = () => {
             </Route>
             <Route exact path="/cps/link/:cp_id">
           <Header/>
-          <One_CP/>
+          <CP_One/>
             </Route>
             <Route exact path="/tenders/link/:tender_id">
           <Header/>
@@ -65,9 +67,17 @@ const  App = () => {
             <Header/>
           <Tech_new/>
             </Route>
+            <Route exact path="/cps/create/:tz_id">
+            <Header/>
+          <CP_New/>
+            </Route>
             <Route exact path="/techs/upd/:tz_id">
             <Header/>
           <Tech_upd/>
+            </Route>
+            <Route exact path="/cps/upd/:cp_id">
+            <Header/>
+          <CP_Upd/>
             </Route>
             </div>:
             <div>

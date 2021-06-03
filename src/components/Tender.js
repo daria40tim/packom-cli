@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
-import {Link} from 'react-router-dom';
+import React, { Component, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {Link, useHistory, withRouter} from 'react-router-dom';
+import { listTenderDetails } from '../actions/tenderAction';
 let data =
     {'date': '14.01.2021',
     'selected_cp': '1', 
@@ -86,18 +88,32 @@ let data =
     ]
     }
   
-
-class Tender extends Component {
-  constructor(props) {
-    super(props);
-        this.onClick = this.onClick.bind(this)
+    Date.prototype.getWeek = function() {
+      var date = new Date(this.getTime());
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+      var week1 = new Date(date.getFullYear(), 0, 4);
+      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
     }
 
-    onClick = (e) => {
-     console.log("1")
-    }
 
-  render() {
+const Tec = ({match}) => {
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const tenderDetails = useSelector(state => state.tenderDetails)
+  const {loading, error, tender} = tenderDetails
+
+  const [cal, setCal] = useState([])
+  let last = 0
+
+
+  useEffect(() => {
+    dispatch(listTenderDetails(match.params.tender_id))
+  }, [dispatch, match])
+  
+  const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+
+
     return(
         <div>
           <div>
@@ -113,73 +129,57 @@ class Tender extends Component {
             </tr>
             <tr align='justify'>
               <td scope="col">Дата тендера</td>
-              <td scope="col">{data.date}
+              <td scope="col">{tender.date}
                   </td>
-            </tr>
-            <tr align='justify'>
-              <td scope="col">Тендерное решение</td>
-              <td scope="col"> 
-              <Link to={`/orgs/link/${data.cp_o_id}`} >
-                  {data.cp_org}
-                </Link>
-                </td>
             </tr>
             <tr align='justify'>
               <td scope="col">Клиент</td>
               <td scope="col">
-                  <Link to={`/orgs/link/${data.tz_o_id}`} >
-                  {data.tz_org}
+                  <Link to={`/orgs/link/${userInfo.o_id}`} >
+                  {tender.client}
                 </Link>
                 </td>
             </tr>
             <tr align='justify'>
               <td scope="col">Проект</td>
-              <td scope="col">{data.proj}</td>
+              <td scope="col">{tender.proj}</td>
             </tr>
             <tr align='justify'>
               <td scope="col">Вид задания</td>
-              <td scope="col">{data.task}</td>
+              <td scope="col">{tender.task}</td>
             </tr>
             <tr align='justify'>
               <td scope="col">Номер ТЗ</td>
-              <td scope="col">  <Link to={`/techs/link/${data.tz_id}`} >
-                  {data.tz_id}
+              <td scope="col">  <Link to={`/techs/link/${tender.tz_id}`} >
+                  {tender.tz_id}
                 </Link></td>
             </tr>
             <tr align='justify'>
               <td scope="col">Количество собранных КП</td>
-              <td scope="col">{data.cp_count}</td>
+              <td scope="col">{tender.cps ? tender.cps.length : 0}</td>
             </tr>
             <tr align='justify'>
               <td scope="col">Максимальное КП</td>
-              <td scope="col">{data.max_cp}</td>
+              <td scope="col">{tender.max_cp}</td>
             </tr>
             <tr align='justify'>
               <td scope="col">Минимальное КП</td>
-              <td scope="col">{data.min_cp}</td>
+              <td scope="col">{tender.min_cp}</td>
             </tr>
             <tr align='justify'>
               <td scope="col">Принятое КП</td>
               <td scope="col"> 
-              <Link to={`/cps/link/${data.cp_id}`} >
-                  {data.selected_cp}
-                </Link></td>
+              {tender.selected_cp != 0 ? <Link to={`/cps/link/${tender.cp_id}`} >
+                  {tender.selected_cp}
+                </Link> : 'КП не выбрано' }</td>
             </tr>
             <tr align='justify'>
               <td scope="col">Срок реализации проекта</td>
-              <td scope="col">{data.term}</td>
+              <td scope="col">{new Date(tender.date).getWeek() + tender.term}</td>
             </tr>
           </tbody>
         </table>
         </div>
-
-        <h5 id="name" className="text-justify">Документация</h5>
-          {data.docs.map((item, i)=>{
-        return (
-          <p className="text-justify">{item}</p>
-       )})}
-         
-          <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Добавить документ</button>
 
 
           <h5 className="text-justify">Тендерная таблица</h5>
@@ -189,72 +189,63 @@ class Tender extends Component {
         <th scope="col"></th>
         <th scope="col">Кол-во</th>
         <th scope="col">Единицы измерения</th>
-        {data.cps.map((item, i)=>{
-        return (<th>{item.org}</th>)})}
+        {tender.cps ? tender.cps.map((item, i)=>{
+        return (<th>{item.org}</th>)}): <p></p>}
       </tr>
     </thead>
     <tbody>
         <tr colSpan='10000'>
             <td align='justify'><h5>Наименование операций</h5></td>
         </tr>
-      {data.tz_costs.map((item, i)=>{
-        return (
-      <tr>
+      
+      {tender.tz_costs ?  tender.tz_costs.map((item, i)=>{
+        return (<tr>
         <td align='justify'>{item.task}</td>
         <td>{item.count}</td>
         <td>{item.metr}</td>
-        </tr>)})}
+        </tr>)}): <p></p>}
+        
         <tr>
             <td align='justify'>Всего</td>
             <td></td>
             <td></td>
-            {data.cps.map((item, i)=>{
-        return (<td>{item.sum}</td>)})}
-        </tr>
-        <tr>
-            <td align='justify'>Всего на ед.</td>
-            <td></td>
-            <td></td>
-            {data.cps.map((item, i)=>{
-        return (<td>{item.sum_ppu}</td>)})}
+            {tender.cps ? tender.cps.map((item, i)=>{
+        return (<td>{item.sum}</td>)}):<p></p>}
         </tr>
         <tr>
             <td align='justify'>Условия оплаты</td>
             <td></td>
             <td></td>
-            {data.cps.map((item, i)=>{return (<td>{item.pay_cond}</td>)})}
+            {tender.cps ? tender.cps.map((item, i)=>{return (<td>{item.pay_cond}</td>)}) : <p></p>}
         </tr>
         <tr colSpan='10000'>
             <td align='justify'><h5>График выполнения работ</h5></td>
         </tr>
-            {data.tz_calendars.map((item, is)=>{return (
+            {tender.tz_calendars ? tender.tz_calendars.map((item, is)=>{return (
                 <tr>
                 <td align='justify'>{item}</td>
                 <td></td>
                 <td></td>
-                {data.cps.map((item, i)=>{return (<td>{item.calendars[is] + " КН"}</td>)})}
+                {tender.cps ? tender.cps.map((item, i)=>{return (<td>{item.calendars[is] + " КН"}</td>)}):<p></p>}
                 </tr>)
-            })}
+            }): <p></p>}
         <tr>
             <td align='justify'> <h5>Решение</h5></td>
             <td></td>
             <td></td>
-            {data.cps.map((item, i)=>{return (
+            {tender.cps ? tender.cps.map((item, i)=>{return (
             <td>
                 <input className="form-check-input" type="radio" name="gridRadios" id={i} value={item.cp_id} />
-                    </td>)})}
+                    </td>)}): <p></p>}
         </tr>
     </tbody>
   </table> 
 
   <button type="button" className="btn btn-outline-dark">Принять решение досрочно</button>
-
-  <h5 className="text-justify">История изменений</h5>
-  <p className="text-justify">{data.history}</p>
 </div>
 </div>
 )
   }
-}
 
-export default Tender;
+  const Tender =withRouter(Tec) 
+  export default Tender;
