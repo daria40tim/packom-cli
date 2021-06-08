@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
-import { listTenderDetails } from '../actions/tenderAction';
+import { decideTender, listTenderDetails } from '../actions/tenderAction';
 let data =
     {'date': '14.01.2021',
     'selected_cp': '1', 
@@ -103,7 +103,8 @@ const Tec = ({match}) => {
   const tenderDetails = useSelector(state => state.tenderDetails)
   const {loading, error, tender} = tenderDetails
 
-  const [cal, setCal] = useState([])
+  const [costs, setCosts] = useState([])
+  const [check, setChecked] = useState(0)
   let last = 0
 
 
@@ -112,6 +113,21 @@ const Tec = ({match}) => {
   }, [dispatch, match])
   
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+
+  useEffect(() => {
+
+  })
+  
+
+  const onClickDecide = () => {
+    dispatch(decideTender(parseInt(match.params.tender_id),  parseInt(check),  parseInt(tender.tz_id)))
+    history.push('/tenders/')
+  }
+
+  const onClickDecline = () => {
+    dispatch(decideTender(parseInt(match.params.tender_id),  parseInt(check), parseInt(tender.tz_id)))
+    history.push('/tenders/')
+  } 
 
 
     return(
@@ -181,8 +197,9 @@ const Tec = ({match}) => {
         </table>
         </div>
 
-
-          <h5 className="text-justify">Тендерная таблица</h5>
+         
+          <h5 className="text-justify">Тендерная таблица</h5> 
+          {!tender.cps ? <h5>Коммерческих предложений не поступало</h5>:
           <table className="table" id="org_table">
     <thead>
       <tr className="org_head">
@@ -203,6 +220,7 @@ const Tec = ({match}) => {
         <td align='justify'>{item.task}</td>
         <td>{item.count}</td>
         <td>{item.metr}</td>
+
         </tr>)}): <p></p>}
         
         <tr>
@@ -233,15 +251,17 @@ const Tec = ({match}) => {
             <td align='justify'> <h5>Решение</h5></td>
             <td></td>
             <td></td>
-            {tender.cps ? tender.cps.map((item, i)=>{return (
+            {tender.selected_cp == 0 ? tender.cps ? tender.cps.map((item, i)=>{return (
             <td>
-                <input className="form-check-input" type="radio" name="gridRadios" id={i} value={item.cp_id} />
-                    </td>)}): <p></p>}
+                <input className="form-check-input" type="radio" name="gridRadios" id={item.cp_id} value={item.cp_id} onChange={(e)=>{setChecked(e.target.value)}}/>
+                    </td>)}): <p></p> : <p></p>}
         </tr>
     </tbody>
-  </table> 
+  </table> }
 
-  <button type="button" className="btn btn-outline-dark">Принять решение досрочно</button>
+  {!tender.active ? 'Тендер был отменен':
+  tender.selected_cp == 0 ? !tender.cps ?<button type="button" className="btn btn-outline-dark" onClick={onClickDecline}>Отменить тендер</button> : tender.date> Date.now() ? <button type="button" onClick={onClickDecide} className="btn btn-outline-dark">Принять решение досрочно</button>
+: <button type="button" className="btn btn-outline-dark" onClick={onClickDecide}>Принять решение</button>: <p></p>}
 </div>
 </div>
 )

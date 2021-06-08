@@ -19,6 +19,9 @@ const One_CP = ({match}) =>  {
     const [info, setInfo] = useState('')
     const [cst, setCst] = useState([])
     const [cal, setCal] = useState([])
+    const [docs, setDocs] = useState([])
+    const [dcs, setDcs] = useState([])
+    const [doc, setDoc] = useState('')
   let tz_last = 0
   let last = 0
   let c = []
@@ -34,12 +37,13 @@ const One_CP = ({match}) =>  {
   const {loading, error, cp} = cpDetails
 
   useEffect(() => {
+    setDocs(cp.docs)
+})
+
+  useEffect(() => {
     dispatch(listCPDetails(match.params.cp_id))
   }, [dispatch, match])
 
-    const onClickDocs = (e) => {
-
-    }
 
     const onClickCst = (e) => {
         cp.tz_costs.forEach(element => {
@@ -64,6 +68,12 @@ const One_CP = ({match}) =>  {
         dispatch(cpDeleteCst(match.params.cp_id))
         console.log(c[0].ppu)
 
+    }
+
+    const onClickDocs= (e) => {
+      let costs = [...dcs]
+      costs.push(doc)
+      setDcs(costs)
     }
 
     const onClickCal = (e) => {
@@ -111,7 +121,7 @@ const One_CP = ({match}) =>  {
             info_ = cp.info
         }
 
-        dispatch(cpUpdate(parseInt(match.params.cp_id), pay_cond_, end_date_, info_, cal, cst, [], hi+cp.history))
+        dispatch(cpUpdate(parseInt(match.params.cp_id), pay_cond_, end_date_, info_, cal, cst, dcs, hi+cp.history))
         history.push('/commertial/')
     }
 
@@ -260,15 +270,20 @@ const One_CP = ({match}) =>  {
               <td scope="col" colSpan="2"><h5>Документация от поставщика</h5></td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2">{cp.docs ? cp.docs.map((item, i)=>{
+              <td scope="col" colSpan="2">{docs ? docs.map((item, i)=>{
         return (
           <p className="text-justify">{item}</p>
        )}) : <p className="text-justify">Документов нет</p>}
+       { dcs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )})}
        </td>
             </tr>
           </tbody>
         </table>
-        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> :
+        <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
+        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> 
         </td>
         </tr>
         </tbody>

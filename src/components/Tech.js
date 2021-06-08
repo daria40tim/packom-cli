@@ -60,8 +60,11 @@ const Tec = ({match}) => {
   const history = useHistory()
   const tzDetails = useSelector(state => state.tzDetails)
   const {loading, error, tech} = tzDetails
+  const tzList = useSelector(state => state.tzList)
+  const data = tzList
 
   const [cal, setCal] = useState([])
+  const [cps, setCps] = useState([])
   let last = 0
 
 
@@ -71,6 +74,7 @@ const Tec = ({match}) => {
 
   useEffect(() => {
     setCal(tech.cal)
+    setCps(data.cps)
 })
   
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null

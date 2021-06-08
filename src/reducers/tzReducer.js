@@ -1,4 +1,4 @@
-import { TZ_CREATE_FAIL, TZ_CREATE_REQUEST, TZ_CREATE_SUCCESS, TZ_DELETE_CAL_FAIL, TZ_DELETE_CAL_REQUEST, TZ_DELETE_CAL_SUCCESS, TZ_DELETE_CST_FAIL, TZ_DELETE_CST_REQUEST, TZ_DELETE_CST_SUCCESS, TZ_DETAILS_FAIL, TZ_DETAILS_REQUEST, TZ_DETAILS_SUCCESS, TZ_LIST_FAIL, TZ_LIST_REQUEST, TZ_LIST_SUCCESS, TZ_UPDATE_FAIL, TZ_UPDATE_REQUEST, TZ_UPDATE_SUCCESS } from '../constants/tzConstants'
+import { TZ_CREATE_FAIL, TZ_CREATE_REQUEST, TZ_CREATE_SUCCESS, TZ_DELETE_CAL_FAIL, TZ_DELETE_CAL_REQUEST, TZ_DELETE_CAL_SUCCESS, TZ_DELETE_CST_FAIL, TZ_DELETE_CST_REQUEST, TZ_DELETE_CST_SUCCESS, TZ_DETAILS_FAIL, TZ_DETAILS_REQUEST, TZ_DETAILS_SUCCESS, TZ_FILE_UPLOAD_FAIL, TZ_FILE_UPLOAD_REQUEST, TZ_FILE_UPLOAD_SUCCESS, TZ_LIST_FAIL, TZ_LIST_REQUEST, TZ_LIST_SORTEDBY_CLIENT, TZ_LIST_SORTEDBY_DATE, TZ_LIST_SORTEDBY_END_DATE, TZ_LIST_SORTEDBY_STATUS, TZ_LIST_SORTEDBY_TZ_ID, TZ_LIST_SORT_FAIL, TZ_LIST_SUCCESS, TZ_UPDATE_FAIL, TZ_UPDATE_REQUEST, TZ_UPDATE_SUCCESS } from '../constants/tzConstants'
 
 export const tzListReducer = (state = {data: {techs: [], cps: []}}, action) => {
     switch (action.type) {
@@ -76,6 +76,40 @@ export const tzUpdateReducer = (state = {}, action) => {
         case TZ_UPDATE_SUCCESS:
             return {loading: false, success: action.payload}
         case TZ_UPDATE_FAIL:
+            return {loading: false, success: false, error: action.payload}
+        default: 
+            return state
+    }
+}
+
+
+export const tzListSortedReducer = (state = {techs:[]}, action) => {
+    switch (action.type) {
+        case TZ_LIST_SORTEDBY_CLIENT:
+            return {loading: false, techs: action.payload}
+        case TZ_LIST_SORTEDBY_DATE:
+            return {loading: false, techs: action.payload}
+        case TZ_LIST_SORTEDBY_END_DATE:
+            return {loading: false, techs: action.payload}
+        case TZ_LIST_SORTEDBY_TZ_ID:
+            return {loading: false, techs: action.payload}
+        case TZ_LIST_SORTEDBY_STATUS:
+            return {loading: false, techs: action.payload}
+        case TZ_LIST_SORT_FAIL:
+            return {loading: false, error: action.payload}
+        default: 
+            return state
+    }
+}
+
+
+export const tzUploadReducer = (state = {}, action) => {
+    switch (action.type) {
+        case TZ_FILE_UPLOAD_REQUEST:
+            return {loading: true }
+        case TZ_FILE_UPLOAD_SUCCESS:
+            return {loading: false, success: action.payload}
+        case TZ_FILE_UPLOAD_FAIL:
             return {loading: false, success: false, error: action.payload}
         default: 
             return state

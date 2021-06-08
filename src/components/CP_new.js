@@ -19,6 +19,8 @@ const One_CP = ({match}) =>  {
     const [info, setInfo] = useState('')
     const [cst, setCst] = useState([])
     const [cal, setCal] = useState([])
+    const [docs, setDocs] = useState([])
+    const [doc, setDoc] = useState('')
   let tz_last = 0
   let last = 0
   let c = []
@@ -35,6 +37,12 @@ const One_CP = ({match}) =>  {
   useEffect(() => {
     dispatch(listTechDetails(match.params.tz_id))
   }, [dispatch])
+
+  const onClickDocs= (e) => {
+    let costs = [...docs]
+    costs.push(doc)
+    setDocs(costs)
+  }
 
 const onClickCst = (e) => {
     tech.cst.forEach(element => {
@@ -77,7 +85,7 @@ const onClickCal = (e) => {
 const history = useHistory()
 
 const onClickAccept = (e) => {
-    dispatch(createCP(parseInt(match.params.tz_id), pay_cond, end_date, info, cal, cst, date, [], tech.proj))
+    dispatch(createCP(parseInt(match.params.tz_id), pay_cond, end_date, info, cal, cst, date, docs, tech.proj))
     history.push('/commertial')
 }
 
@@ -221,6 +229,18 @@ const onClickAccept = (e) => {
             <tr>
               <td scope="col" colSpan="2"><input className='cr_input' name='pay_cond' value={info} onChange={(e)=>setInfo(e.target.value)}></input></td>
             </tr>
+            <tr>
+              <td scope="col" colSpan="2"><h5>Документация от поставщика</h5></td>
+            </tr>
+            <tr>
+              <td scope="col" colSpan="2">{docs ? docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify">Документов нет</p>}
+               <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
+        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> 
+       </td>
+            </tr>
           </tbody>
         </table>
         </td>
@@ -228,8 +248,6 @@ const onClickAccept = (e) => {
         </tbody>
         </table>
         </div>
-         
-          <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Добавить документ</button>
 
 
           <h5 className="text-justify">Разбивка стоимости</h5>

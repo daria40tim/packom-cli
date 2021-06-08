@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 import {useDispatch, useSelector} from 'react-redux'
-import {listOrg, sortOrgsByName} from '../actions/orgAction'
+import {listOrg, sortOrgsByCountry, sortOrgsByGroup, sortOrgsByName, sortOrgsBySpec} from '../actions/orgAction'
 import {Link} from 'react-router-dom';
 import Loader from './Loader';
 import Message from './Message';
@@ -39,11 +39,12 @@ const Orgs = () => {
   
     useEffect(() => {dispatch(listOrg())}, [dispatch])
     const {loading, error, orgs} = orgList
+    const [nameFlag, setNameFlag] = useState(true)
+    const [countryFlag, setCountryFlag] = useState(true)
+    const [specFlag, setSpecFlag] = useState(true)
+    const [groupFlag, setGroupFlag] = useState(true)
 
-    let nameFlag = true 
-    let groupFlag = true
-    let specFlag = true 
-    let countryFlag= true
+
 
     let onClick = (e) => {
       /*let arr = []
@@ -71,99 +72,23 @@ const Orgs = () => {
     }
 
   let onClickName = () => {
-    /*let arr = orgs.sort((a, b)=>{
-      if ((a.name > b.name) && nameFlag) {
-        return -1;
-      }
-      if ((a.name < b.name) && nameFlag) {
-        return 1;
-      }
-      if ((a.name > b.name) && !nameFlag) {
-        return 1;
-      }
-      if ((a.name < b.name) && !nameFlag) {
-        return -1;
-      }
-      return 0;
-    })
-
-    //setData(arr), 
-    nameFlag = !nameFlag*/
+    dispatch(sortOrgsByName(orgs, nameFlag))
+    setNameFlag(!nameFlag)
   }
 
-  let onClickCountry = () => {/*
-    let arr = this.state.data.sort((a, b)=>{
-      if ((a.country > b.country) && this.state.countryFlag) {
-        return -1;
-      }
-      if ((a.country < b.country) && this.state.countryFlag) {
-        return 1;
-      }
-      if ((a.country > b.country) && !this.state.countryFlag) {
-        return 1;
-      }
-      if ((a.country < b.country) && !this.state.countryFlag) {
-        return -1;
-      }
-      return 0;
-    })
-    
-    this.setState({
-      data: arr, 
-      countryFlag: !this.state.countryFlag
-    })
-
-    this.forceUpdate()*/
+  let onClickCountry = () => {
+    dispatch(sortOrgsByCountry(orgs, countryFlag))
+    setCountryFlag(!countryFlag)
   }
 
-  let onClickSpec = () => {/*
-    let arr = this.state.data.sort((a, b)=>{
-      if ((a.spec > b.spec) && this.state.specFlag) {
-        return -1;
-      }
-      if ((a.spec < b.spec) && this.state.specFlag) {
-        return 1;
-      }
-      if ((a.spec > b.spec) && !this.state.specFlag) {
-        return 1;
-      }
-      if ((a.spec < b.spec) && !this.state.specFlag) {
-        return -1;
-      }
-      return 0;
-    })
-    
-    this.setState({
-      data: arr, 
-      specFlag: !this.state.specFlag
-    })
-
-    this.forceUpdate()*/
+  let onClickSpec = () => {
+    dispatch(sortOrgsBySpec(orgs, specFlag))
+    setSpecFlag(!specFlag)
   }
   
-  let onClickGroup = () => {/*
-    let arr = this.state.data.sort((a, b)=>{
-      if ((a.group > b.group) && this.state.groupFlag) {
-        return -1;
-      }
-      if ((a.group < b.group) && this.state.groupFlag) {
-        return 1;
-      }
-      if ((a.group > b.group) && !this.state.groupFlag) {
-        return 1;
-      }
-      if ((a.group < b.group) && !this.state.groupFlag) {
-        return -1;
-      }
-      return 0;
-    })
-    
-    this.setState({
-      data: arr, 
-      groupFlag: !this.state.groupFlag
-    })
-
-    this.forceUpdate()*/
+  let onClickGroup = () => {
+    dispatch(sortOrgsByGroup(orgs, groupFlag))
+    setGroupFlag(!groupFlag)
   }
 
   //render() {
@@ -177,75 +102,7 @@ const Orgs = () => {
          <table className="main_table">
           <tr>
             <td valign="top" align="justify">
-        <div className="filter">
-      <form>
 
- 
-
-  <p>Группа</p>
-  <div>
-    <div>
-    <div className="form-check">
-      <input className="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value='Поставщик'/>
-      <label className="form-check-label" for="gridRadios1">
-        Поставщик
-      </label>
-    </div>
-    <div className="form-check">
-      <input className="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value='Клиент' />
-      <label className="form-check-label" for="gridRadios2">
-        Клиент
-      </label>
-    </div>
-    <div className="form-check">
-      <input className="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value='Клиент, поставщик' />
-      <label className="form-check-label" for="gridRadios3">
-        Клиент, поставщик
-      </label>
-    </div>
-  </div>
-  </div>
-  
-  <p>Страна</p>
-  <div>
-  <select className="form-select" id="country_select">
-          <option>Россия</option>
-      </select>
-  </div>
-
-  <label>Специализация</label>
-  <div>
-  <div>
-
-          
-      {specs.map((item, i)=>{
-      return (
-        <div className="form-check">
-        <input className="form-check-input" type="checkbox" value={item}  id={i}/>
-        <label className="form-check-label">
-          {item}
-        </label>
-        </div>
-        
-      )})}
-
-      </div>
-
-  </div>
-  <div>
- <p>Название</p>
-  <select className="form-select" id="name_select">
-          <option disabled>Выберите название</option>
-          <option selected value="">Не выбрано</option>
-          {orgs.map((item, i)=>{
-      return (
-          <option value={item.name}>{item.name}</option>
-      )})}  
-      </select>
-      </div>
-    <button type="button" className="btn btn-outline-dark" onClick={onClick}>Применить</button>
-</form>
-</div>
 </td>
 
 
@@ -371,4 +228,75 @@ export default Orgs;
        {orgs.map((item, i)=>{
       return (
           <option value={item.name}>{item.name}</option>
-      )})}*/
+      )})}
+      
+      
+       <div className="filter">
+      <form>
+
+ 
+
+  <p>Группа</p>
+  <div>
+    <div>
+    <div className="form-check">
+      <input className="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value='Поставщик'/>
+      <label className="form-check-label" for="gridRadios1">
+        Поставщик
+      </label>
+    </div>
+    <div className="form-check">
+      <input className="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value='Клиент' />
+      <label className="form-check-label" for="gridRadios2">
+        Клиент
+      </label>
+    </div>
+    <div className="form-check">
+      <input className="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value='Клиент, поставщик' />
+      <label className="form-check-label" for="gridRadios3">
+        Клиент, поставщик
+      </label>
+    </div>
+  </div>
+  </div>
+  
+  <p>Страна</p>
+  <div>
+  <select className="form-select" id="country_select">
+          <option>Россия</option>
+      </select>
+  </div>
+
+  <label>Специализация</label>
+  <div>
+  <div>
+
+          
+      {specs.map((item, i)=>{
+      return (
+        <div className="form-check">
+        <input className="form-check-input" type="checkbox" value={item}  id={i}/>
+        <label className="form-check-label">
+          {item}
+        </label>
+        </div>
+        
+      )})}
+
+      </div>
+
+  </div>
+  <div>
+ <p>Название</p>
+  <select className="form-select" id="name_select">
+          <option disabled>Выберите название</option>
+          <option selected value="">Не выбрано</option>
+          {orgs.map((item, i)=>{
+      return (
+          <option value={item.name}>{item.name}</option>
+      )})}  
+      </select>
+      </div>
+    <button type="button" className="btn btn-outline-dark" onClick={onClick}>Применить</button>
+</form>
+</div>*/

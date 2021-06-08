@@ -1,4 +1,4 @@
-import { ORG_FAIL, ORG_LIST_FAIL, ORG_LIST_REQUEST, ORG_LIST_SORTEDBY_NAME, ORG_LIST_SUCCESS, ORG_REQUEST, ORG_SUCCESS, ORG_UPDATE_REQUEST, ORG_UPDATE_FAIL, ORG_UPDATE_SUCCESS, ADD_ORG_REQUEST, ADD_ORG_SUCCESS, ADD_ORG_FAIL } from '../constants/orgConstants'
+import { ORG_FAIL, ORG_LIST_FAIL, ORG_LIST_REQUEST, ORG_LIST_SORTEDBY_NAME, ORG_LIST_SUCCESS, ORG_REQUEST, ORG_SUCCESS, ORG_UPDATE_REQUEST, ORG_UPDATE_FAIL, ORG_UPDATE_SUCCESS, ADD_ORG_REQUEST, ADD_ORG_SUCCESS, ADD_ORG_FAIL, ORG_LIST_SORTEDBY_SPEC, ORG_LIST_SORTEDBY_COUNTRY, ORG_LIST_SORTEDBY_GROUP } from '../constants/orgConstants'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 
@@ -148,6 +148,102 @@ export const listOrgAdd = (id) => async(dispatch) => {
   } catch (error) {
     dispatch({
       type: ADD_ORG_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+export const sortOrgsByCountry = (orgs, countryFlag) => async(dispatch) => {
+  try {
+    dispatch({type: ORG_LIST_SORTEDBY_COUNTRY})
+
+    const data = orgs.sort((a, b)=>{
+      if ((a.country > b.country) && countryFlag) {
+        return -1;
+      }
+      if ((a.country < b.country) && countryFlag) {
+        return 1;
+      }
+      if ((a.country > b.country) && !countryFlag) {
+        return 1;
+      }
+      if ((a.country < b.country) && !countryFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: ORG_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: ORG_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+export const sortOrgsBySpec = (orgs, specFlag) => async(dispatch) => {
+  try {
+    dispatch({type: ORG_LIST_SORTEDBY_SPEC})
+
+    const data = orgs.sort((a, b)=>{
+      if ((a.spec > b.spec) && specFlag) {
+        return -1;
+      }
+      if ((a.spec < b.spec) && specFlag) {
+        return 1;
+      }
+      if ((a.spec > b.spec) && !specFlag) {
+        return 1;
+      }
+      if ((a.spec < b.spec) && !specFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: ORG_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: ORG_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+export const sortOrgsByGroup = (orgs, groupFlag) => async(dispatch) => {
+  try {
+    dispatch({type: ORG_LIST_SORTEDBY_GROUP})
+
+    const data = orgs.sort((a, b)=>{
+      if ((a.group > b.group) && groupFlag) {
+        return -1;
+      }
+      if ((a.group < b.group) && groupFlag) {
+        return 1;
+      }
+      if ((a.group > b.group) && !groupFlag) {
+        return 1;
+      }
+      if ((a.group < b.group) && !groupFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: ORG_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: ORG_FAIL,
       payload: error.response && error.response.data.message ? error.response.data.message : error.message
     })
   }

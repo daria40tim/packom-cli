@@ -1,5 +1,5 @@
 import axios from "axios"
-import { CP_CREATE_FAIL, CP_CREATE_REQUEST, CP_CREATE_SUCCESS, CP_DELETE_CAL_FAIL, CP_DELETE_CAL_REQUEST, CP_DELETE_CAL_SUCCESS, CP_DELETE_CST_FAIL, CP_DELETE_CST_REQUEST, CP_DELETE_CST_SUCCESS, CP_DETAILES_FAIL, CP_DETAILES_REQUEST, CP_DETAILES_SUCCESS, CP_LIST_FAIL, CP_LIST_REQUEST, CP_LIST_SUCCESS, CP_UPDATE_FAIL, CP_UPDATE_REQUEST, CP_UPDATE_SUCCESS } from "../constants/cpConstants"
+import { CP_CREATE_FAIL, CP_CREATE_REQUEST, CP_CREATE_SUCCESS, CP_DELETE_CAL_FAIL, CP_DELETE_CAL_REQUEST, CP_DELETE_CAL_SUCCESS, CP_DELETE_CST_FAIL, CP_DELETE_CST_REQUEST, CP_DELETE_CST_SUCCESS, CP_DETAILES_FAIL, CP_DETAILES_REQUEST, CP_DETAILES_SUCCESS, CP_LIST_FAIL, CP_LIST_REQUEST, CP_LIST_SORTEDBY_CP_ID, CP_LIST_SORTEDBY_DATE, CP_LIST_SORTEDBY_ORG, CP_LIST_SORTEDBY_TZ_ID, CP_LIST_SORT_FAIL, CP_LIST_SORT_SUCCESS, CP_LIST_SUCCESS, CP_UPDATE_FAIL, CP_UPDATE_REQUEST, CP_UPDATE_SUCCESS } from "../constants/cpConstants"
 
 export const listCPs = () => async(dispatch) => {
     try {
@@ -174,6 +174,138 @@ export const listCPs = () => async(dispatch) => {
     } catch (error) {
       dispatch({
         type: CP_DELETE_CST_FAIL,
+        payload: error.response && error.response.data.message ? error.response.data.message : error.message
+      })
+    }
+  }
+
+
+  export const sortCPByDate = (cps, dateFlag) => async(dispatch) => {
+    try {
+      dispatch({type: CP_LIST_SORTEDBY_DATE})
+  
+      const data = cps.sort((a, b)=>{
+        if ((Date.parse(a.date) > Date.parse(b.date) ) && dateFlag) {
+          return -1;
+        }
+        if ((Date.parse(a.date)  < Date.parse(b.date)) && dateFlag) {
+          return 1;
+        }
+        if ((Date.parse(a.date)  > Date.parse(b.date)) && !dateFlag) {
+          return 1;
+        }
+        if ((Date.parse(a.date)  < Date.parse(b.date)) && !dateFlag) {
+          return -1;
+        }
+        return 0;
+      })
+  
+      dispatch({
+        type: CP_LIST_SORT_SUCCESS,
+        payload: data
+      })
+    } catch (error) {
+      dispatch({
+        type: CP_LIST_SORT_FAIL,
+        payload: error.response && error.response.data.message ? error.response.data.message : error.message
+      })
+    }
+  }
+
+  export const sortCPById = (cps, cp_idFlag) => async(dispatch) => {
+    try {
+      dispatch({type: CP_LIST_SORTEDBY_CP_ID})
+  
+      const data = cps.sort((a, b)=>{
+        if ((a.cp_id > b.cp_id) && cp_idFlag) {
+          return -1;
+        }
+        if ((a.cp_id < b.cp_id) && cp_idFlag) {
+          return 1;
+        }
+        if ((a.cp_id > b.cp_id) && !cp_idFlag) {
+          return 1;
+        }
+        if ((a.cp_id < b.cp_id) && !cp_idFlag) {
+          return -1;
+        }
+        return 0;
+      })
+  
+      dispatch({
+        type: CP_LIST_SORT_SUCCESS,
+        payload: data
+      })
+    } catch (error) {
+      dispatch({
+        type: CP_LIST_SORT_FAIL,
+        payload: error.response && error.response.data.message ? error.response.data.message : error.message
+      })
+    }
+  }
+
+
+
+  export const sortCPByTzId = (cps, tz_idFlag) => async(dispatch) => {
+    try {
+      dispatch({type: CP_LIST_SORTEDBY_TZ_ID})
+  
+      const data = cps.sort((a, b)=>{
+        if ((a.tz_id > b.tz_id) && tz_idFlag) {
+          return -1;
+        }
+        if ((a.tz_id < b.tz_id) && tz_idFlag) {
+          return 1;
+        }
+        if ((a.tz_id > b.tz_id) && !tz_idFlag) {
+          return 1;
+        }
+        if ((a.tz_id < b.tz_id) && !tz_idFlag) {
+          return -1;
+        }
+        return 0;
+      })
+  
+      dispatch({
+        type: CP_LIST_SORT_SUCCESS,
+        payload: data
+      })
+    } catch (error) {
+      dispatch({
+        type: CP_LIST_SORT_FAIL,
+        payload: error.response && error.response.data.message ? error.response.data.message : error.message
+      })
+    }
+  }
+
+
+  export const sortCPByOrg = (cps, orgFlag) => async(dispatch) => {
+    try {
+      dispatch({type: CP_LIST_SORTEDBY_ORG})
+  
+      const data = cps.sort((a, b)=>{
+        if ((a.org > b.org) && orgFlag) {
+          return -1;
+        }
+        if ((a.org < b.org) && orgFlag) {
+          return 1;
+        }
+        if ((a.org > b.org) && !orgFlag) {
+          return 1;
+        }
+        if ((a.org < b.org) && !orgFlag) {
+          return -1;
+        }
+        return 0;
+      })
+  
+      dispatch({
+        type: CP_LIST_SORT_SUCCESS,
+        payload: data
+      })
+    } catch (error) {
+      dispatch({
+        type: CP_LIST_SORT_FAIL,
         payload: error.response && error.response.data.message ? error.response.data.message : error.message
       })
     }

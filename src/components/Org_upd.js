@@ -191,7 +191,6 @@ const Ord_update = ({match}) => {
         return (
           <p className="text-justify">{item}</p>
        )}) : <p className="text-justify">Документов нет</p>}
-          <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Добавить</button>
 
           <h5 className="text-justify">О компании</h5>
           <div>

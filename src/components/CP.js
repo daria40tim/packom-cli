@@ -1,7 +1,7 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
-import { listCPs } from '../actions/cpAction';
+import { listCPs, sortCPByDate, sortCPById, sortCPByOrg, sortCPByTzId } from '../actions/cpAction';
 import Loader from './Loader';
 import Message from './Message';
 
@@ -61,11 +61,30 @@ const C = () => {
   const {loading, error, cps} = cpList
   useEffect(() => {dispatch(listCPs())}, [dispatch])
 
-  let cp_idFlag = true 
-  let  dateFlag = true
-  let cp_stFlag = true 
-  let o_idFlag= true
-  let tz_idFlag= true
+  
+  const onClickDate = () => {
+    dispatch(sortCPByDate(cps, dateFlag))
+    setDateFlag(!dateFlag)
+  }
+
+  const onClickCPId = () => {
+    dispatch(sortCPById(cps, cp_idFlag))
+    setCpIdFlag(!cp_idFlag)
+  }
+
+  const onClickTZId = () => {
+    dispatch(sortCPByTzId(cps, tz_idFlag))
+    setTzIdFlag(!tz_idFlag)
+  }
+
+  const onClickOrg = () => {
+    dispatch(sortCPByOrg(cps, o_idFlag))
+    setOrgFlag(!o_idFlag)
+  }
+  const [tz_idFlag, setTzIdFlag] = useState(true)
+  const [dateFlag, setDateFlag] = useState(true)
+  const [cp_idFlag, setCpIdFlag] = useState(true)
+  const [o_idFlag, setOrgFlag] = useState(true)
 
     return(
       <div>
@@ -77,74 +96,7 @@ const C = () => {
         <table className="main_table">
         <tr>
             <td valign="top" align="justify">
-        <div className="filter">
-      <form>
-
-
-
-<div>
-      <p>Дата КП</p>
-      <div>
-  <p>C</p>
-  <input className="form-text-input" type="text"/>
-  </div>
-  <div>
-  <p>По</p>
-  <input className="form-text-input" type="text"/>
-  </div>
-</div>
-
-<div>
-  <p>Номер КП</p>
-  <select className="form-select" id="name_select">
-          <option selected value="">Не выбрано</option>
-      </select>
-</div>
-
-
-<div>
-  <p>Статус КП</p>
-  <div>
-    <div>
-    {stats.map((item, i)=>{
-      return (
-        <div className="form-check">
-        <input className="form-check-input" type="checkbox" value={item.status}  id={i}/>
-        <label className="form-check-label">
-          {item}
-        </label>
-        </div>
-        
-      )})}
-  </div>
-  </div>
-  </div>
-
-  <div>
-  <p>Номер ТЗ</p>
-  <select className="form-select" id="name_select">
-          <option selected value="">Не выбрано</option>
-      </select>
-</div>
-  
-
-  <div>
-  <p>Проект</p>
-  <select className="form-select" id="name_select">
-          <option selected value="">Не выбрано</option>
-      </select>
-</div>
-
-<div>
-      <p>Поставщик</p>
-  <select className="form-select" id="name_select">
-          <option selected value="">Не выбрано</option>
-      </select>
-</div>
-
-    <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Применить</button>
-</form>
-</div>
+     
 
 
 </td>
@@ -156,25 +108,22 @@ const C = () => {
       <tr className="org_head">
       <th scope="col">
           <p>Номер КП</p>
-          <button onClick={this.onClickId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={onClickCPId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path d={cp_idFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
 </svg></button>
           </th>
         <th scope="col">
           <p>Дата КП</p>
-          <button onClick={this.onClickDate} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={onClickDate} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path d={dateFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
 </svg></button>
           </th>
         <th scope="col">
           <p>Статус КП</p>
-          <button onClick={this.onClickCpSt} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d={cp_stFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
-</svg></button>
           </th>
           <th scope="col">
           <p>Номер ТЗ</p>
-          <button onClick={this.onClickTzId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <button onClick={onClickTZId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path d={tz_idFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
 </svg></button>
           </th>
@@ -183,7 +132,7 @@ const C = () => {
           </th>
         <th scope="col">
             <p>Поставщик</p>
-            <button onClick={this.onClickOId} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <button onClick={onClickOrg} type="button" className="btn sort_btn"><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path d={o_idFlag ? "M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" :"M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"}/>
 </svg></button>
             </th>
@@ -412,4 +361,73 @@ export default CP;
     })
 
     this.forceUpdate()
-  }*/
+  }
+  
+     <div className="filter">
+      <form>
+
+
+
+<div>
+      <p>Дата КП</p>
+      <div>
+  <p>C</p>
+  <input className="form-text-input" type="text"/>
+  </div>
+  <div>
+  <p>По</p>
+  <input className="form-text-input" type="text"/>
+  </div>
+</div>
+
+<div>
+  <p>Номер КП</p>
+  <select className="form-select" id="name_select">
+          <option selected value="">Не выбрано</option>
+      </select>
+</div>
+
+
+<div>
+  <p>Статус КП</p>
+  <div>
+    <div>
+    {stats.map((item, i)=>{
+      return (
+        <div className="form-check">
+        <input className="form-check-input" type="checkbox" value={item.status}  id={i}/>
+        <label className="form-check-label">
+          {item}
+        </label>
+        </div>
+        
+      )})}
+  </div>
+  </div>
+  </div>
+
+  <div>
+  <p>Номер ТЗ</p>
+  <select className="form-select" id="name_select">
+          <option selected value="">Не выбрано</option>
+      </select>
+</div>
+  
+
+  <div>
+  <p>Проект</p>
+  <select className="form-select" id="name_select">
+          <option selected value="">Не выбрано</option>
+      </select>
+</div>
+
+<div>
+      <p>Поставщик</p>
+  <select className="form-select" id="name_select">
+          <option selected value="">Не выбрано</option>
+      </select>
+</div>
+
+    <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Применить</button>
+</form>
+</div>*/

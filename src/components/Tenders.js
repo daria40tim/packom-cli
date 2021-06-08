@@ -194,7 +194,73 @@ const Tender = () => {
         <table className="main_table">
           <tr>
             <td valign="top" align="justify">
-        <div className="filter">
+
+</td>
+
+
+      <td align='justify' valign="top"  width="150%">
+      <div className="main_t">
+    <table className="table" id="org_table">
+    <thead>
+      <tr className="org_head">
+        <th scope="col">
+          <p>Номер решения</p>
+          </th>
+        <th scope="col">
+          <p>Номер ТЗ</p>
+          </th>
+          <th scope="col">
+          <p>Дата решения</p>
+          </th>
+          <th scope="col">
+          <p>Проект</p>
+          </th>
+        <th scope="col">Группа упаковки</th>
+        <th scope="col">Тип упаковки</th>
+        <th scope="col">Вид упаковки</th>
+        <th scope="col">Вид задания</th>
+        <th scope="col">
+          <p>Статус тендера</p>
+          </th>
+      </tr>
+    </thead>
+    <tbody>
+      {tenders ? tenders.map((item, i)=>{
+        return (
+      <tr>
+        <td>
+          <Link to={`/tenders/link/${item.tender_id}`} >
+            {item.tender_id}
+          </Link>
+        </td>
+        <td><Link to={`/techs/link/${item.tz_id}`} >
+            {item.tz_id}
+          </Link></td>
+        <td>{item.date}</td>
+        <td>{item.proj}</td>
+        <td>{item.group}</td>
+        <td>{item.type}</td>
+        <td>{item.kind}</td>
+        <td>{item.task}</td>
+        <td>{item.selected_cp != 0 ? 'Принято' : item.tz_st == 4 ? 'Отменено' : Date.parse(item.end_date) - Date.now() > 0 ? "Ожидает решение" :  'Сбор КП'}</td>
+      </tr>)}): <Message>У вас еще нет тендерных решений</Message>}
+    </tbody>
+  </table> 
+</div>
+</td>
+</tr>
+</table>
+</div>
+)
+  }
+
+  const Tenders =withRouter(Tender) 
+  export default Tenders;
+
+
+
+
+  /*<div className="filter">
       <form class="form-inline">
 
 
@@ -267,65 +333,4 @@ const Tender = () => {
 
     <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Применить</button>
 </form>
-</div>
-</td>
-
-
-      <td align='justify' valign="top"  width="150%">
-      <div className="main_t">
-    <table className="table" id="org_table">
-    <thead>
-      <tr className="org_head">
-        <th scope="col">
-          <p>Номер решения</p>
-          </th>
-        <th scope="col">
-          <p>Номер ТЗ</p>
-          </th>
-          <th scope="col">
-          <p>Дата решения</p>
-          </th>
-          <th scope="col">
-          <p>Проект</p>
-          </th>
-        <th scope="col">Группа упаковки</th>
-        <th scope="col">Тип упаковки</th>
-        <th scope="col">Вид упаковки</th>
-        <th scope="col">Вид задания</th>
-        <th scope="col">
-          <p>Статус тендера</p>
-          </th>
-      </tr>
-    </thead>
-    <tbody>
-      {tenders ? tenders.map((item, i)=>{
-        return (
-      <tr>
-        <td>
-          <Link to={`/tenders/link/${item.tender_id}`} >
-            {item.tender_id}
-          </Link>
-        </td>
-        <td><Link to={`/techs/link/${item.tz_id}`} >
-            {item.tz_id}
-          </Link></td>
-        <td>{item.date}</td>
-        <td>{item.proj}</td>
-        <td>{item.group}</td>
-        <td>{item.type}</td>
-        <td>{item.kind}</td>
-        <td>{item.task}</td>
-        <td>{Date.parse(item.end_date) - Date.now() > 0 ? 'Требуется решение' : 'Сбор КП' }</td>
-      </tr>)}): <Message>У вас еще нет тендерных решений</Message>}
-    </tbody>
-  </table> 
-</div>
-</td>
-</tr>
-</table>
-</div>
-)
-  }
-
-  const Tenders =withRouter(Tender) 
-  export default Tenders;
+</div>*/

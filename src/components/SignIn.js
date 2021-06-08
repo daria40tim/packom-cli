@@ -56,7 +56,7 @@ const SignIn = (location) =>  {
         <label className="sr-only">Password</label>
         <input type="password" className="form-control" placeholder="Пароль" onChange={(e)=>setPassword(e.target.value)} />
         <button className="btn btn-lg btn-primary btn-block" type="submit" onClick={submitHandler}>
-            <Link to='/orgs'>Войти</Link>
+            Войти
             </button>
         <p className="mt-5 mb-3 text-muted">Для получения логина и пароля обратитесь на почтовый ящик mail4reserve@gmail.com</p>
       </form>

@@ -40,6 +40,10 @@ const Tec_upd = ({match}) => {
     const [cal, setCal] = useState([])
     const [cst, setCst] = useState([])
     const [calendar, setCalendar] = useState([])
+    const [docs, setDocs] = useState([])
+    const [dcs, setDcs] = useState([])
+    const [doc, setDoc] = useState('')
+    const [dc, setDc] = useState('')
     const [cost, setCost] = useState([])
     const [last, setLast] = useState(0)
     const date = new Date().toISOString().slice(0, 10)
@@ -64,6 +68,7 @@ const Tec_upd = ({match}) => {
     useEffect(() => {
         setCst(tech.cst)
         setCal(tech.cal)
+        setDocs(tech.docs)
     })
 
     const {load, err, data} = selectList
@@ -147,7 +152,7 @@ const Tec_upd = ({match}) => {
             info_ = tech.info
         }
 
-        dispatch(tzUpdate(parseInt(match.params.tz_id), proj_, group_, type_, kind_, task_, pay_cond_, end_date_, info_, calendar, cost, hi+tech.history))
+        dispatch(tzUpdate(parseInt(match.params.tz_id), proj_, group_, type_, kind_, task_, pay_cond_, end_date_, info_, calendar, cost, hi+tech.history, dcs))
         history.push('/tech/')
     }
 
@@ -173,6 +178,12 @@ const Tec_upd = ({match}) => {
 
         document.getElementById(e.target.id).innerHTML = 'Удалено'
         document.getElementById(e.target.id).setAttribute('disabled', true)
+    }
+
+    const onClickDocs= (e) => {
+      let costs = [...dcs]
+      costs.push(doc)
+      setDcs(costs)
     }
      
     return(
@@ -285,8 +296,16 @@ const Tec_upd = ({match}) => {
         </table>
         </div>
           <h5 id="name" className="text-justify">Документация</h5>
-         
-          <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Добавить</button>
+          <div>
+          {docs ? docs.map((item)=>{ return(
+          <p>{item}</p>)
+          }) : <p></p>}
+          {dcs ? dcs.map((item)=>{ return(
+          <p>{item}</p>)
+          }) : <p></p>}
+         </div>
+          <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
+          <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button>
 
           <h5 className="text-justify">Описание работ</h5>
           <textarea className='cr_input' name='adress' value={info} onChange={(e)=>setInfo(e.target.value)} placeholder={tech.info}></textarea>

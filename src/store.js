@@ -3,10 +3,10 @@ import thunk from 'redux-thunk'
 import {orgAddReducer, orgListReducer, orgReducer, orgUpdateReducer} from './reducers/orgReducer'
 import {userLoginReducer, userRegisterReducer} from './reducers/userRedusers'
 import {composeWithDevTools} from 'redux-devtools-extension'
-import { tzCreateReducer, tzDeleteCalReducer, tzDeleteCstReducer, tzListReducer, tzReducer } from './reducers/tzReducer'
+import { tzCreateReducer, tzDeleteCalReducer, tzDeleteCstReducer, tzListReducer, tzListSortedReducer, tzReducer } from './reducers/tzReducer'
 import { selectListReducer } from './reducers/selectReducer'
 import { cpCreateReducer, cpDeleteCalReducer, cpDeleteCstReducer, cpListReducer, cpReducer } from './reducers/cpReducers'
-import { fullCostsReducer, tenderListReducer, tenderReducer } from './reducers/tenderReducer'
+import { fullCostsReducer, tenderDecideReducer, tenderListReducer, tenderReducer } from './reducers/tenderReducer'
 
 
 const reducer = combineReducers({
@@ -30,6 +30,8 @@ const reducer = combineReducers({
     tenderList: tenderListReducer,
     tenderDetails: tenderReducer,
     fullCosts: fullCostsReducer,  
+    decideTender: tenderDecideReducer, 
+    tzListSorted: tzListSortedReducer,
 })
 
 const userInfoFromStorage = localStorage.getItem('userInfo')

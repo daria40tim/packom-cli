@@ -2,7 +2,7 @@ import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
 import { listSelect } from '../actions/selectAction';
-import { createTZ } from '../actions/tzAction';
+import { createTZ, uploadFile } from '../actions/tzAction';
 
 Date.prototype.getWeek = function() {
   var date = new Date(this.getTime());
@@ -35,10 +35,12 @@ const Tec_new = () => {
     const [taskCost, setTaskCost] = useState('')
     const [taskCal, setTaskCal] = useState('')
     const [metr, setMetr] = useState('')
+    const [doc, setDoc] = useState('')
     const [count, setCount] = useState(0)
     const [period, setPeriod] = useState(0)
     const [cal, setCal] = useState([])
     const [cst, setCst] = useState([])
+    const [docs, setDocs] = useState([])
     const [last, setLast] = useState(0)
     const date = new Date().toISOString().slice(0, 10)
 
@@ -72,9 +74,17 @@ const Tec_new = () => {
     }
 
     const onClickAccept = () => {
-      dispatch(createTZ(proj, group, type, kind, task, pay_cond, end_date, privacy.toString(), info, cal, cst, date))
+      dispatch(createTZ(proj, group, type, kind, task, pay_cond, end_date, privacy.toString(), info, cal, cst, date, docs))
       history.push('/tech/')
     }
+
+    const onClickDocs= () => {
+      let d = [...docs]
+      d.push(doc)
+      setDocs(d)
+      console.log(docs.length)
+    }
+
    
      
     return(
@@ -191,8 +201,13 @@ const Tec_new = () => {
         </table>
         </div>
           <h5 id="name" className="text-justify">Документация</h5>
-         
-          <button type="button" className="btn btn-outline-dark" onClick={this.onClick}>Добавить</button>
+          <div>
+          {docs ? docs.map((item)=>{ return(
+          <p>{item}</p>)
+          }) : <p></p>}
+         </div>
+          <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
+          <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button>
 
           <h5 className="text-justify">Описание работ</h5>
           <textarea className='cr_input' name='adress' value={info} onChange={(e)=>setInfo(e.target.value)}></textarea>

@@ -1,4 +1,4 @@
-import {TZ_LIST_FAIL, TZ_LIST_SUCCESS, TZ_LIST_REQUEST, TZ_DETAILS_REQUEST, TZ_DETAILS_SUCCESS, TZ_DETAILS_FAIL, TZ_CREATE_REQUEST, TZ_CREATE_SUCCESS, TZ_CREATE_FAIL, TZ_DELETE_CAL_REQUEST, TZ_DELETE_CAL_SUCCESS, TZ_DELETE_CAL_FAIL, TZ_DELETE_CST_REQUEST, TZ_DELETE_CST_SUCCESS, TZ_DELETE_CST_FAIL, TZ_UPDATE_REQUEST, TZ_UPDATE_SUCCESS, TZ_UPDATE_FAIL } from '../constants/tzConstants'
+import {TZ_LIST_FAIL, TZ_LIST_SUCCESS, TZ_LIST_SORT_SUCCESS, TZ_LIST_SORTEDBY_TZ_ID, TZ_LIST_SORTEDBY_STATUS, TZ_LIST_REQUEST, TZ_DETAILS_REQUEST, TZ_DETAILS_SUCCESS, TZ_DETAILS_FAIL, TZ_CREATE_REQUEST, TZ_CREATE_SUCCESS, TZ_CREATE_FAIL, TZ_DELETE_CAL_REQUEST, TZ_DELETE_CAL_SUCCESS, TZ_DELETE_CAL_FAIL, TZ_DELETE_CST_REQUEST, TZ_DELETE_CST_SUCCESS, TZ_DELETE_CST_FAIL, TZ_UPDATE_REQUEST, TZ_UPDATE_SUCCESS, TZ_UPDATE_FAIL, TZ_LIST_SORTEDBY_CLIENT, TZ_LIST_SORT_FAIL, TZ_LIST_SORTEDBY_DATE, TZ_LIST_SORTEDBY_END_DATE, TZ_FILE_UPLOAD_REQUEST, TZ_FILE_UPLOAD_SUCCESS, TZ_FILE_UPLOAD_FAIL } from '../constants/tzConstants'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 
@@ -63,7 +63,7 @@ export const listTechDetails = (id) => async(dispatch) => {
   }
 }
 
-export const createTZ = (proj, group, type, kind, task, pay_cond, end_date, privacy, info, cal, cst, date) => async(dispatch) => {
+export const createTZ = (proj, group, type, kind, task, pay_cond, end_date, privacy, info, cal, cst, date, docs) => async(dispatch) => {
   try {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
     dispatch({type: TZ_CREATE_REQUEST})
@@ -77,7 +77,7 @@ export const createTZ = (proj, group, type, kind, task, pay_cond, end_date, priv
       mode: 'cors'
   }
 
-    await axios.post(`http://127.0.0.1:8000/api/techs/`, {proj, group, type, kind, task, pay_cond, end_date, privacy, info, cal, cst, date}, config)
+    await axios.post(`http://127.0.0.1:8000/api/techs/`, {proj, group, type, kind, task, pay_cond, end_date, privacy, info, cal, cst, date, docs}, config)
 
     dispatch({
       type: TZ_CREATE_SUCCESS,
@@ -148,7 +148,7 @@ export const deleteCst = (tz_id, task) => async(dispatch) => {
   }
 }
 
-export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history) => async(dispatch) => {
+export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history, docs) => async(dispatch) => {
   try {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
     dispatch({type: TZ_UPDATE_REQUEST})
@@ -162,7 +162,7 @@ export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_dat
       mode: 'cors'
   }
 
-    await axios.put(`http://127.0.0.1:8000/api/techs/${tz_id}`, {proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history}, config)
+    await axios.put(`http://127.0.0.1:8000/api/techs/${tz_id}`, {proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history, docs}, config)
 
     dispatch({
       type: TZ_UPDATE_SUCCESS,
@@ -171,6 +171,200 @@ export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_dat
   } catch (error) {
     dispatch({
       type: TZ_UPDATE_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+
+export const sortTechsByClient = (techs, clientFlag) => async(dispatch) => {
+  try {
+    dispatch({type: TZ_LIST_SORTEDBY_CLIENT})
+
+    const data = techs.sort((a, b)=>{
+      if ((a.client > b.client) && clientFlag) {
+        return -1;
+      }
+      if ((a.client < b.client) && clientFlag) {
+        return 1;
+      }
+      if ((a.client > b.client) && !clientFlag) {
+        return 1;
+      }
+      if ((a.client < b.client) && !clientFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: TZ_LIST_SORT_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: TZ_LIST_SORT_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+
+export const sortTechsByDate = (techs, dateFlag) => async(dispatch) => {
+  try {
+    dispatch({type: TZ_LIST_SORTEDBY_DATE})
+
+    const data = techs.sort((a, b)=>{
+      if ((Date.parse(a.date) > Date.parse(b.date) ) && dateFlag) {
+        return -1;
+      }
+      if ((Date.parse(a.date)  < Date.parse(b.date)) && dateFlag) {
+        return 1;
+      }
+      if ((Date.parse(a.date)  > Date.parse(b.date)) && !dateFlag) {
+        return 1;
+      }
+      if ((Date.parse(a.date)  < Date.parse(b.date)) && !dateFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: TZ_LIST_SORT_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: TZ_LIST_SORT_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+
+
+export const sortTechsByEndDate = (techs, end_dateFlag) => async(dispatch) => {
+  try {
+    dispatch({type: TZ_LIST_SORTEDBY_END_DATE})
+
+    const data = techs.sort((a, b)=>{
+      if ((Date.parse(a.end_date) > Date.parse(b.end_date) ) && end_dateFlag) {
+        return -1;
+      }
+      if ((Date.parse(a.end_date)  < Date.parse(b.end_date)) && end_dateFlag) {
+        return 1;
+      }
+      if ((Date.parse(a.end_date)  > Date.parse(b.end_date)) && !end_dateFlag) {
+        return 1;
+      }
+      if ((Date.parse(a.end_date)  < Date.parse(b.end_date)) && !end_dateFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: TZ_LIST_SORT_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: TZ_LIST_SORT_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+
+export const sortTechsByStatus = (techs, statusFlag) => async(dispatch) => {
+  try {
+    dispatch({type: TZ_LIST_SORTEDBY_STATUS})
+
+    const data = techs.sort((a, b)=>{
+      if ((Date.parse(a.end_date) > Date.parse(b.end_date) ) && statusFlag) {
+        return -1;
+      }
+      if ((Date.parse(a.end_date)  < Date.parse(b.end_date)) && statusFlag) {
+        return 1;
+      }
+      if ((Date.parse(a.end_date)  > Date.parse(b.end_date)) && !statusFlag) {
+        return 1;
+      }
+      if ((Date.parse(a.end_date)  < Date.parse(b.end_date)) && !statusFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: TZ_LIST_SORT_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: TZ_LIST_SORT_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+
+export const sortTechsByTzId = (techs, tz_idFlag) => async(dispatch) => {
+  try {
+    dispatch({type: TZ_LIST_SORTEDBY_TZ_ID})
+
+    const data = techs.sort((a, b)=>{
+      if ((a.tz_id > b.tz_id) && tz_idFlag) {
+        return -1;
+      }
+      if ((a.tz_id < b.tz_id) && tz_idFlag) {
+        return 1;
+      }
+      if ((a.tz_id > b.tz_id) && !tz_idFlag) {
+        return 1;
+      }
+      if ((a.tz_id < b.tz_id) && !tz_idFlag) {
+        return -1;
+      }
+      return 0;
+    })
+
+    dispatch({
+      type: TZ_LIST_SORT_SUCCESS,
+      payload: data
+    })
+  } catch (error) {
+    dispatch({
+      type: TZ_LIST_SORT_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+export const uploadFile = (formData) => async(dispatch) => {
+  try {
+    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+    dispatch({type: TZ_FILE_UPLOAD_REQUEST})
+    let auth = "Bearer " + userInfo.token
+
+    const config = {
+      headers: {
+          'Content-Type': 'multipart/form-data',
+          "Authorization": auth
+      },
+      mode: 'cors'
+  }
+
+    await axios.post(`http://127.0.0.1:8000/api/techs/docs`, {formData}, config)
+
+    dispatch({
+      type: TZ_FILE_UPLOAD_SUCCESS,
+      payload: true
+    })
+  } catch (error) {
+    dispatch({
+      type: TZ_FILE_UPLOAD_FAIL,
       payload: error.response && error.response.data.message ? error.response.data.message : error.message
     })
   }
