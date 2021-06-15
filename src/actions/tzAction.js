@@ -1,4 +1,4 @@
-import {TZ_LIST_FAIL, TZ_LIST_SUCCESS, TZ_LIST_SORT_SUCCESS, TZ_LIST_SORTEDBY_TZ_ID, TZ_LIST_SORTEDBY_STATUS, TZ_LIST_REQUEST, TZ_DETAILS_REQUEST, TZ_DETAILS_SUCCESS, TZ_DETAILS_FAIL, TZ_CREATE_REQUEST, TZ_CREATE_SUCCESS, TZ_CREATE_FAIL, TZ_DELETE_CAL_REQUEST, TZ_DELETE_CAL_SUCCESS, TZ_DELETE_CAL_FAIL, TZ_DELETE_CST_REQUEST, TZ_DELETE_CST_SUCCESS, TZ_DELETE_CST_FAIL, TZ_UPDATE_REQUEST, TZ_UPDATE_SUCCESS, TZ_UPDATE_FAIL, TZ_LIST_SORTEDBY_CLIENT, TZ_LIST_SORT_FAIL, TZ_LIST_SORTEDBY_DATE, TZ_LIST_SORTEDBY_END_DATE, TZ_FILE_UPLOAD_REQUEST, TZ_FILE_UPLOAD_SUCCESS, TZ_FILE_UPLOAD_FAIL } from '../constants/tzConstants'
+import {TZ_LIST_FAIL, TZ_LIST_SUCCESS, TZ_LIST_SORT_SUCCESS, TZ_LIST_SORTEDBY_TZ_ID, TZ_LIST_SORTEDBY_STATUS, TZ_LIST_REQUEST, TZ_DETAILS_REQUEST, TZ_DETAILS_SUCCESS, TZ_DETAILS_FAIL, TZ_CREATE_REQUEST, TZ_CREATE_SUCCESS, TZ_CREATE_FAIL, TZ_DELETE_CAL_REQUEST, TZ_DELETE_CAL_SUCCESS, TZ_DELETE_CAL_FAIL, TZ_DELETE_CST_REQUEST, TZ_DELETE_CST_SUCCESS, TZ_DELETE_CST_FAIL, TZ_UPDATE_REQUEST, TZ_UPDATE_SUCCESS, TZ_UPDATE_FAIL, TZ_LIST_SORTEDBY_CLIENT, TZ_LIST_SORT_FAIL, TZ_LIST_SORTEDBY_DATE, TZ_LIST_SORTEDBY_END_DATE, TZ_FILE_UPLOAD_REQUEST, TZ_FILE_UPLOAD_SUCCESS, TZ_FILE_UPLOAD_FAIL, DOWN_TZ_DOC_REQUEST, DOWN_TZ_DOC_SUCCESS, DOWN_TZ_DOC_FAIL } from '../constants/tzConstants'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 
@@ -91,7 +91,7 @@ export const createTZ = (proj, group, type, kind, task, pay_cond, end_date, priv
   }
 }
 
-export const deleteCal = (tz_id, task_name) => async(dispatch) => {
+export const deleteCal = (tz_id, task_name, history) => async(dispatch) => {
   try {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
     dispatch({type: TZ_DELETE_CAL_REQUEST})
@@ -105,7 +105,7 @@ export const deleteCal = (tz_id, task_name) => async(dispatch) => {
       mode: 'cors'
   }
 
-    await axios.post(`http://127.0.0.1:8000/api/techs/delete_cal`, {tz_id, task_name}, config)
+    await axios.post(`http://127.0.0.1:8000/api/techs/delete_cal`, {tz_id, task_name, history}, config)
 
     dispatch({
       type: TZ_DELETE_CAL_SUCCESS,
@@ -120,7 +120,7 @@ export const deleteCal = (tz_id, task_name) => async(dispatch) => {
 }
 
 
-export const deleteCst = (tz_id, task) => async(dispatch) => {
+export const deleteCst = (tz_id, task, history) => async(dispatch) => {
   try {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
     dispatch({type: TZ_DELETE_CST_REQUEST})
@@ -134,7 +134,7 @@ export const deleteCst = (tz_id, task) => async(dispatch) => {
       mode: 'cors'
   }
 
-    await axios.post(`http://127.0.0.1:8000/api/techs/delete_cst`, {tz_id, task}, config)
+    await axios.post(`http://127.0.0.1:8000/api/techs/delete_cst`, {tz_id, task, history}, config)
 
     dispatch({
       type: TZ_DELETE_CST_SUCCESS,
@@ -148,7 +148,8 @@ export const deleteCst = (tz_id, task) => async(dispatch) => {
   }
 }
 
-export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history, docs) => async(dispatch) => {
+
+export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history) => async(dispatch) => {
   try {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
     dispatch({type: TZ_UPDATE_REQUEST})
@@ -162,7 +163,7 @@ export const tzUpdate = (tz_id, proj, group, type, kind, task, pay_cond, end_dat
       mode: 'cors'
   }
 
-    await axios.put(`http://127.0.0.1:8000/api/techs/${tz_id}`, {proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history, docs}, config)
+    await axios.put(`http://127.0.0.1:8000/api/techs/${tz_id}`, {proj, group, type, kind, task, pay_cond, end_date, info, cal, cst, history}, config)
 
     dispatch({
       type: TZ_UPDATE_SUCCESS,
@@ -365,6 +366,42 @@ export const uploadFile = (formData) => async(dispatch) => {
   } catch (error) {
     dispatch({
       type: TZ_FILE_UPLOAD_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+export const listTzDownDoc = (name, tz_id) => async(dispatch) => {
+  try { 
+    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+    dispatch({type: DOWN_TZ_DOC_REQUEST})
+    let auth = "Bearer " + userInfo.token
+    const config = {
+      headers: {
+          "Authorization": auth,
+      },
+      mode: 'cors', 
+      responseType: 'blob'
+  }
+
+    const response = await axios.get(`http://127.0.0.1:8000/api/techs/doc/${name}/${tz_id}`, config)
+    .then(({ data }) => {
+      const downloadUrl = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', name); //any other extension
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    dispatch({
+      type: DOWN_TZ_DOC_SUCCESS,
+      payload: true
+    })
+  } catch (error) {
+    dispatch({
+      type: DOWN_TZ_DOC_FAIL,
       payload: error.response && error.response.data.message ? error.response.data.message : error.message
     })
   }

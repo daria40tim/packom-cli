@@ -47,7 +47,7 @@ export const logout = () => (dispatch) => {
     dispatch({type: USER_LOGOUT})
 }
 
-export const register = (email, name, password, group_id) => async (dispatch) => {
+export const register = (email, name, password, group_id, countries) => async (dispatch) => {
     try {
         dispatch({
             type: USER_REGISTER_REQUEST,
@@ -66,7 +66,7 @@ export const register = (email, name, password, group_id) => async (dispatch) =>
 
         const {data} = await axios.post(
             'http://127.0.0.1:8000/auth/sign-up', 
-            {email, name, password, group_id},
+            {email, name, password, group_id, countries},
             config
             )
 

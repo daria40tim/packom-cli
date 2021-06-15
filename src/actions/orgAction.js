@@ -1,4 +1,4 @@
-import { ORG_FAIL, ORG_LIST_FAIL, ORG_LIST_REQUEST, ORG_LIST_SORTEDBY_NAME, ORG_LIST_SUCCESS, ORG_REQUEST, ORG_SUCCESS, ORG_UPDATE_REQUEST, ORG_UPDATE_FAIL, ORG_UPDATE_SUCCESS, ADD_ORG_REQUEST, ADD_ORG_SUCCESS, ADD_ORG_FAIL, ORG_LIST_SORTEDBY_SPEC, ORG_LIST_SORTEDBY_COUNTRY, ORG_LIST_SORTEDBY_GROUP } from '../constants/orgConstants'
+import { ORG_FAIL, ORG_LIST_FAIL, ORG_LIST_REQUEST, ORG_LIST_SORTEDBY_NAME, ORG_LIST_SUCCESS, ORG_REQUEST, ORG_SUCCESS, ORG_UPDATE_REQUEST, ORG_UPDATE_FAIL, ORG_UPDATE_SUCCESS, ADD_ORG_REQUEST, ADD_ORG_SUCCESS, ADD_ORG_FAIL, ORG_LIST_SORTEDBY_SPEC, ORG_LIST_SORTEDBY_COUNTRY, ORG_LIST_SORTEDBY_GROUP, ADD_ORG_DOC_REQUEST, ADD_ORG_DOC_SUCCESS, ADD_ORG_DOC_FAIL, DOWN_ORG_DOC_REQUEST, DOWN_ORG_DOC_SUCCESS, DOWN_ORG_DOC_FAIL } from '../constants/orgConstants'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 
@@ -96,7 +96,7 @@ export const sortOrgsByName = (orgs, nameFlag) => async(dispatch) => {
   }
 }
 
-export const listOrgDetailsUpdate = (adress, phone, email, site, specs, password, info) => async(dispatch) => {
+export const listOrgDetailsUpdate = (adress, phone, email, site, spec, password, info, history) => async(dispatch) => {
   try {
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
     dispatch({type: ORG_UPDATE_REQUEST})
@@ -110,7 +110,7 @@ export const listOrgDetailsUpdate = (adress, phone, email, site, specs, password
       mode: 'cors'
   }
 
-    const { data } = await axios.put(`http://127.0.0.1:8000/api/orgs/`, {adress, phone, email, site, specs, password, info}, config)
+    const { data } = await axios.put(`http://127.0.0.1:8000/api/orgs/`, {adress, phone, email, site, spec, password, info, history}, config)
 
     dispatch({
       type: ORG_UPDATE_SUCCESS,
@@ -244,6 +244,70 @@ export const sortOrgsByGroup = (orgs, groupFlag) => async(dispatch) => {
   } catch (error) {
     dispatch({
       type: ORG_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+
+export const listOrgAddDoc = (data) => async(dispatch) => {
+  try { 
+    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+    dispatch({type: ADD_ORG_DOC_REQUEST})
+    let auth = "Bearer " + userInfo.token
+    const config = {
+      headers: {
+          "Authorization": auth,
+          ...data.getHeaders()
+      },
+      mode: 'cors'
+  }
+
+    await axios.post(`http://127.0.0.1:8000/api/orgs/docs`,{data: data}, config)
+
+    dispatch({
+      type: ADD_ORG_DOC_SUCCESS,
+      payload: true
+    })
+  } catch (error) {
+    dispatch({
+      type: ADD_ORG_DOC_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message
+    })
+  }
+}
+
+export const listOrgDownDoc = (name, o_id) => async(dispatch) => {
+  try { 
+    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+    dispatch({type: DOWN_ORG_DOC_REQUEST})
+    let auth = "Bearer " + userInfo.token
+    const config = {
+      headers: {
+          "Authorization": auth,
+      },
+      mode: 'cors', 
+      responseType: 'blob'
+  }
+
+    const response = await axios.get(`http://127.0.0.1:8000/api/orgs/doc/${name}/${o_id}`, config)
+    .then(({ data }) => {
+      const downloadUrl = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', name); //any other extension
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    dispatch({
+      type: DOWN_ORG_DOC_SUCCESS,
+      payload: true
+    })
+  } catch (error) {
+    dispatch({
+      type: DOWN_ORG_DOC_FAIL,
       payload: error.response && error.response.data.message ? error.response.data.message : error.message
     })
   }

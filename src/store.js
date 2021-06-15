@@ -1,11 +1,11 @@
 import {createStore, combineReducers, applyMiddleware} from 'redux'
 import thunk from 'redux-thunk'
-import {orgAddReducer, orgListReducer, orgReducer, orgUpdateReducer} from './reducers/orgReducer'
+import {orgAddReducer, orgDownDocReducer, orgListReducer, orgReducer, orgUpdateReducer} from './reducers/orgReducer'
 import {userLoginReducer, userRegisterReducer} from './reducers/userRedusers'
 import {composeWithDevTools} from 'redux-devtools-extension'
-import { tzCreateReducer, tzDeleteCalReducer, tzDeleteCstReducer, tzListReducer, tzListSortedReducer, tzReducer } from './reducers/tzReducer'
-import { selectListReducer } from './reducers/selectReducer'
-import { cpCreateReducer, cpDeleteCalReducer, cpDeleteCstReducer, cpListReducer, cpReducer } from './reducers/cpReducers'
+import { tzCreateReducer, tzDeleteCalReducer, tzDeleteCstReducer, tzDownDocReducer, tzListReducer, tzListSortedReducer, tzReducer } from './reducers/tzReducer'
+import { selectListReducer, selectSpecsReducer } from './reducers/selectReducer'
+import { cpCreateReducer, cpDeleteCalReducer, cpDeleteCstReducer, cpDownDocReducer, cpListReducer, cpReducer } from './reducers/cpReducers'
 import { fullCostsReducer, tenderDecideReducer, tenderListReducer, tenderReducer } from './reducers/tenderReducer'
 
 
@@ -32,6 +32,10 @@ const reducer = combineReducers({
     fullCosts: fullCostsReducer,  
     decideTender: tenderDecideReducer, 
     tzListSorted: tzListSortedReducer,
+    specsList: selectSpecsReducer, 
+    orgDocDownload: orgDownDocReducer,
+    cpDocDownload: cpDownDocReducer,
+    tzDocDownload: tzDownDocReducer,
 })
 
 const userInfoFromStorage = localStorage.getItem('userInfo')

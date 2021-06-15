@@ -22,6 +22,7 @@ const One_CP = ({match}) =>  {
     const [docs, setDocs] = useState([])
     const [dcs, setDcs] = useState([])
     const [doc, setDoc] = useState('')
+    const [file, setFile] = useState()
   let tz_last = 0
   let last = 0
   let c = []
@@ -37,10 +38,6 @@ const One_CP = ({match}) =>  {
   const {loading, error, cp} = cpDetails
 
   useEffect(() => {
-    setDocs(cp.docs)
-})
-
-  useEffect(() => {
     dispatch(listCPDetails(match.params.cp_id))
   }, [dispatch, match])
 
@@ -54,6 +51,10 @@ const One_CP = ({match}) =>  {
             })
         });
         for (let index = 0; index < c.length; index++) {
+            if (!Number.isInteger(document.getElementById(index).value)){
+              alert('Поля цен за единицу должны быть целыми')
+              return
+            }
             if (document.getElementById(index).value != ''){ 
             c[index].ppu = document.getElementById(index).value}
             document.getElementById(index).setAttribute('disabled', true)
@@ -71,9 +72,33 @@ const One_CP = ({match}) =>  {
     }
 
     const onClickDocs= (e) => {
-      let costs = [...dcs]
-      costs.push(doc)
-      setDcs(costs)
+      var fileInput = document.getElementById("myfileinput");
+
+      let auth = "Bearer " + userInfo.token
+
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", auth);
+
+      var formdata = new FormData();
+      formdata.append("doc", fileInput.files[0], fileInput.files[0].name);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      fetch(`http://127.0.0.1:8000/api/cps/docs/${parseInt(match.params.cp_id)}`, requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+      let d = [...docs]
+      d.push(fileInput.files[0].name)
+      setDocs(d)
+
+      alert('Документ добавлен')
     }
 
     const onClickCal = (e) => {
@@ -85,6 +110,10 @@ const One_CP = ({match}) =>  {
             })
         });
         for (let index = 0; index < ca.length; index++) {
+          if (!Number.isInteger(document.getElementById(index+200000).value)){
+            alert('Поля периодов должны быть целыми')
+            return
+          }
             if (document.getElementById(index+200000).value != ''){ 
             ca[index].period = parseInt(document.getElementById(index+200000).value)}
             document.getElementById(index+200000).setAttribute('disabled', true)
@@ -102,23 +131,50 @@ const One_CP = ({match}) =>  {
         let pay_cond_ = ''
         if (pay_cond != ''){ 
             pay_cond_ = pay_cond
-            hi = hi + " \n Изменены условия оплаты: " + pay_cond_
+            hi = hi + " \n Изменены условия оплаты: " + pay_cond_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             pay_cond_ = cp.pay_cond
         }
         let end_date_ = ''
         if (end_date != ''){ 
             end_date_ = end_date
-            hi = hi + " \n Изменена конечная дата: " + end_date_
+            hi = hi + " \n Изменена конечная дата: " + end_date_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             end_date_ = cp.end_date
         }
         let info_ = ''
         if (info != ''){ 
             info_ = info
-            hi = hi + " \n Изменена общая информация: " + info_
+            hi = hi + " \n Изменена общая информация: " + info_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             info_ = cp.info
+        }
+        let cal_ = []
+        if (cal != []){ 
+            cal_ = cal
+            cal.forEach(element => {
+              hi = hi + " \n Обновлен график: " + element.task_name + " длительностью " + element.period + " кн. Дата: " + new Date().toISOString().slice(0, 10)
+            });
+        }else {
+            cal_ = cal
+        }
+        let cst_ = []
+        if (cst != []){ 
+            cst_ = cst
+            cst.forEach(element => {
+              hi = hi + " \n Обновлена стоимость: " + element.task + ". Дата: " + new Date().toISOString().slice(0, 10)
+            });
+        }else {
+            cst_ = cst
+        }
+        let docs_ = []
+        if (docs != []){ 
+            docs_ = docs
+            docs.forEach(element => {
+              hi = hi + " \n Добавлен документ: " + element + ". Дата: " + new Date().toISOString().slice(0, 10)
+            });
+        }else {
+            docs_ = docs
         }
 
         dispatch(cpUpdate(parseInt(match.params.cp_id), pay_cond_, end_date_, info_, cal, cst, dcs, hi+cp.history))
@@ -270,20 +326,20 @@ const One_CP = ({match}) =>  {
               <td scope="col" colSpan="2"><h5>Документация от поставщика</h5></td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2">{docs ? docs.map((item, i)=>{
+              <td scope="col" colSpan="2"> {cp.docs ? cp.docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify"></p>}
+         {docs ? docs.map((item, i)=>{
         return (
           <p className="text-justify">{item}</p>
        )}) : <p className="text-justify">Документов нет</p>}
-       { dcs.map((item, i)=>{
-        return (
-          <p className="text-justify">{item}</p>
-       )})}
+           <input type="file" className="form-control-file" id="myfileinput" onChange={(e)=>setFile(e.target.files[0])}/>
+           <button type="button" className="btn btn-outline-dark m-5" onClick={onClickDocs}>Добавить</button>
        </td>
             </tr>
           </tbody>
         </table>
-        <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
-        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> 
         </td>
         </tr>
         </tbody>
@@ -333,7 +389,7 @@ const One_CP = ({match}) =>  {
 {cp.tz_costs ? cp.tz_costs.map((item, i)=>{
         return (
       <tr>
-        <td><input className='cr_input' name='pay_cond' id={i} placeholder={item.ppu}></input></td>
+        <td><input  name='pay_cond' id={i} placeholder={item.ppu} type="text"></input></td>
         <td></td>
         <td><input className='cr_input' name='pay_cond' id={i+100000} placeholder={item.info}></input></td>
 
@@ -392,7 +448,7 @@ const One_CP = ({match}) =>  {
       {cp.tz_calendars ? cp.tz_calendars.map((item, i)=>{ last = last + item.period
         return (
       <tr>
-        <td><input className='cr_input' id={i+200000} name='pay_cond' placeholder={item.period}></input></td>
+        <td><input className='cr_input' id={i+200000} name='pay_cond' pattern="[0-9]*" placeholder={item.period}></input></td>
         <td></td>
       </tr>)}) : <p></p> }
     </tbody>

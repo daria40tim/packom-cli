@@ -53,6 +53,10 @@ const onClickCst = (e) => {
         })
     });
     for (let index = 0; index < c.length; index++) {
+      if (!Number.isInteger(document.getElementById(index).value)){
+        alert('Поля цен за единицу должны быть целыми')
+        return
+      }
         c[index].ppu = document.getElementById(index).value
         document.getElementById(index).setAttribute('disabled', true)
     }
@@ -74,6 +78,10 @@ const onClickCal = (e) => {
         })
     });
     for (let index = 0; index < ca.length; index++) {
+      if (!Number.isInteger(document.getElementById(index+200000).value)){
+        alert('Поля периодов должны быть целыми')
+        return
+      }
         ca[index].period = parseInt(document.getElementById(index+200000).value)
         document.getElementById(index+200000).setAttribute('disabled', true)
     }
@@ -233,12 +241,7 @@ const onClickAccept = (e) => {
               <td scope="col" colSpan="2"><h5>Документация от поставщика</h5></td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2">{docs ? docs.map((item, i)=>{
-        return (
-          <p className="text-justify">{item}</p>
-       )}) : <p className="text-justify">Документов нет</p>}
-               <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
-        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> 
+              <td scope="col" colSpan="2"><h5>Добавление документов возможно из панели редактирования КП</h5>
        </td>
             </tr>
           </tbody>
@@ -380,3 +383,10 @@ const onClickAccept = (e) => {
 
 const CP_New =withRouter(One_CP) 
 export default CP_New;
+/* <td scope="col" colSpan="2">{docs ? docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify">Документов нет</p>}
+               <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
+        <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button> 
+       </td>*/

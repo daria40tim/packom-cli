@@ -201,13 +201,7 @@ const Tec_new = () => {
         </table>
         </div>
           <h5 id="name" className="text-justify">Документация</h5>
-          <div>
-          {docs ? docs.map((item)=>{ return(
-          <p>{item}</p>)
-          }) : <p></p>}
-         </div>
-          <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
-          <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button>
+          <h5>Добавление документов возможно из панели редактирования ТЗ.</h5>
 
           <h5 className="text-justify">Описание работ</h5>
           <textarea className='cr_input' name='adress' value={info} onChange={(e)=>setInfo(e.target.value)}></textarea>
@@ -307,3 +301,10 @@ const Tec_new = () => {
   }
   const Tech_new =withRouter(Tec_new) 
   export default Tech_new;
+  /* <div>
+          {docs ? docs.map((item)=>{ return(
+          <p>{item}</p>)
+          }) : <p></p>}
+         </div>
+          <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
+          <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button>*/

@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, withRouter} from 'react-router-dom';
-import {listOrgDetails, listOrgAdd} from '../actions/orgAction'
+import {listOrgDetails, listOrgAdd, listOrgDownDoc} from '../actions/orgAction'
 import Loader from './Loader';
 import Message from './Message';
 let data = 
@@ -79,6 +79,10 @@ const Or = ({match}) => {
 
       dispatch(listOrgAdd(match.params.o_id))
   }
+  const onClickDownload = (e) => {
+    console.log(e.target.id)
+    dispatch(listOrgDownDoc(org.docs[e.target.id], parseInt(match.params.o_id)))
+  }
 
 
   //render() {
@@ -128,28 +132,32 @@ const Or = ({match}) => {
               <td scope="col">{org.site}</td>
             </tr>
             <tr>
+              <td scope="col">Статус</td>
+              <td scope="col">Активна</td>
+            </tr>
+            {userInfo.group_id =="2" || userInfo.group_id =="3" ?<tr>
               <td scope="col">Специализация</td>
               <td scope="col">{org.spec}</td>
-            </tr>
+            </tr>:<p></p>}
           </tbody>
         </table>
         </div>
         {userInfo.o_id == match.params.o_id ? <button type="button" className="btn btn-outline-dark">
           <Link className="nav-link " to={`/orgs/upd/${userInfo.o_id}`}>Изменить данные</Link>
           </button>
-         : org.group=="Поставщик" || org.group=="Клиент, поставщик"  ?
+         : org.group=="Поставщик" || org.group=="Клиент, Поставщик" && userInfo.group_id!=2  ?
          <button type="button" className="btn btn-outline-dark" onClick={onClick}>Добавить в список поставщиков</button>
         : <div></div>
         }
           <h5 id="name" className="text-justify">Документация</h5>
           {org.docs ? org.docs.map((item, i)=>{
         return (
-          <p className="text-justify">{item}</p>
+          <button className="btn" onClick={onClickDownload} id={i}>{item}</button>
        )}) : <p className="text-justify">Документов нет</p>}
 
           <h5 className="text-justify">О компании</h5>
           <p className="text-justify">{org.info}</p>
-
+          {userInfo.o_id == match.params.o_id ? <div>
           <h5 className="text-justify">Список поставщиков</h5>
           <table className="table" id="org_table">
     <thead>
@@ -181,14 +189,14 @@ const Or = ({match}) => {
       </tr>)}) : <tr></tr>}
     </tbody>
   </table> 
+  </div>: ''}
   <h5 className="text-justify">История изменений</h5>
-  <p className="text-justify">{org.history}</p>
+  <textarea className='cr_area'  rows="5">{org.history}</textarea>
 </div>
 }
 </div>
 )
   }
-//}
 
 const Org =withRouter(Or) 
 export default Org;

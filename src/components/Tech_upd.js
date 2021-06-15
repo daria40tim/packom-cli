@@ -29,7 +29,7 @@ const Tec_upd = ({match}) => {
     const [kind, setKind] = useState('')
     const [task, setTask] = useState('')
     const [pay_cond, setPay_cond] = useState('')
-    const [end_date, setEnd_date] = useState(null)
+    const [end_date, setEnd_date] = useState('')
     const [privacy, setPrivacy] = useState(false)
     const [info, setInfo] = useState('')
     const [taskCost, setTaskCost] = useState('')
@@ -46,6 +46,7 @@ const Tec_upd = ({match}) => {
     const [dc, setDc] = useState('')
     const [cost, setCost] = useState([])
     const [last, setLast] = useState(0)
+    const [file, setFile] = useState()
     const date = new Date().toISOString().slice(0, 10)
 
 
@@ -68,7 +69,6 @@ const Tec_upd = ({match}) => {
     useEffect(() => {
         setCst(tech.cst)
         setCal(tech.cal)
-        setDocs(tech.docs)
     })
 
     const {load, err, data} = selectList
@@ -98,61 +98,89 @@ const Tec_upd = ({match}) => {
         let proj_ = ''
         if (proj != ''){ 
             proj_ = proj
-            hi = hi + " \n Изменен проект: " + proj_
+            hi = hi + " \n Изменен проект: " + proj_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             proj_ = tech.proj
         }
         let group_ = ''
         if (group != ''){ 
             group_ = group
-            hi = hi + " \n Изменена группа упаковки: " + group_
+            hi = hi + " \n Изменена группа упаковки: " + group_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             group_ = tech.group
         }
         let type_ = ''
         if (type != ''){ 
             type_ = type
-            hi = hi + " \n Изменен тип упаковки: " + type_
+            hi = hi + " \n Изменен тип упаковки: " + type_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             type_ = tech.type
         }
         let kind_ = ''
         if (kind != ''){ 
             kind_ = kind
-            hi = hi + " \n Изменен вид упаковки: " + kind_
+            hi = hi + " \n Изменен вид упаковки: " + kind_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             kind_ = tech.kind
         }
         let task_ = ''
         if (task != ''){ 
             task_ = task
-            hi = hi + " \n Изменен вид задания: " + task_
+            hi = hi + " \n Изменен вид задания: " + task_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             task_ = tech.task
         }
         let pay_cond_ = ''
         if (pay_cond != ''){ 
             pay_cond_ = pay_cond
-            hi = hi + " \n Изменены условия оплаты: " + pay_cond_
+            hi = hi + " \n Изменены условия оплаты: " + pay_cond_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             pay_cond_ = tech.pay_cond
         }
         let end_date_ = ''
         if (end_date != ''){ 
             end_date_ = end_date
-            hi = hi + " \n Изменена конечная дата: " + end_date_
+            hi = hi + " \n Изменена конечная дата: " + end_date_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             end_date_ = tech.end_date
         }
         let info_ = ''
         if (info != ''){ 
             info_ = info
-            hi = hi + " \n Изменена общая информация: " + info_
+            hi = hi + " \n Изменена общая информация: " + info_ + " Дата: " + new Date().toISOString().slice(0, 10)
         }else {
             info_ = tech.info
         }
+        let calendar_ = []
+        if (calendar != []){ 
+            calendar_ = calendar
+            calendar.forEach(element => {
+              hi = hi + " \n Добавлен график: " + element.task_name + " длительностью " + element.period + " кн. Дата: " + new Date().toISOString().slice(0, 10)
+            });
+        }else {
+            calendar_ = cal
+        }
+        let cost_ = []
+        if (cost != []){ 
+            cost_ = cost
+            cost.forEach(element => {
+              hi = hi + " \n Добавлена стоимость: " + element.task + " в количестве " + element.count + " " + element.metr +". Дата: " + new Date().toISOString().slice(0, 10)
+            });
+        }else {
+            cost_ = cal
+        }
+        let docs_ = []
+        if (docs != []){ 
+            docs_ = docs
+            docs.forEach(element => {
+              hi = hi + " \n Добавлен документ: " + element + ". Дата: " + new Date().toISOString().slice(0, 10)
+            });
+        }else {
+            docs_ = cal
+        }
 
-        dispatch(tzUpdate(parseInt(match.params.tz_id), proj_, group_, type_, kind_, task_, pay_cond_, end_date_, info_, calendar, cost, hi+tech.history, dcs))
+        dispatch(tzUpdate(parseInt(match.params.tz_id), proj_, group_, type_, kind_, task_, pay_cond_, end_date_, info_, calendar, cost, hi+tech.history))
+        console.log(pay_cond_)
         history.push('/tech/')
     }
 
@@ -160,8 +188,10 @@ const Tec_upd = ({match}) => {
         let costs = [...cst]
 
         let i = e.target.id
+
+        const his = " \n Удалена стоимость: " + costs[i].task + " Дата: " + new Date().toISOString().slice(0, 10) + tech.history
         
-        dispatch(deleteCst(match.params.tz_id, costs[i].task))
+        dispatch(deleteCst(match.params.tz_id, costs[i].task, his))
 
         document.getElementById(e.target.id).innerHTML = 'Удалено'
         document.getElementById(e.target.id).setAttribute('disabled', true)
@@ -173,17 +203,43 @@ const Tec_upd = ({match}) => {
         let i = e.target.id-100000
 
         console.log(calendars[i].task_name)
+
+        const his = " \n Удален график: " + calendars[i].task_name + " Дата: " + new Date().toISOString().slice(0, 10) + tech.history
         
-        dispatch(deleteCal(match.params.tz_id, calendars[i].task_name))
+        dispatch(deleteCal(match.params.tz_id, calendars[i].task_name, his))
 
         document.getElementById(e.target.id).innerHTML = 'Удалено'
         document.getElementById(e.target.id).setAttribute('disabled', true)
     }
 
     const onClickDocs= (e) => {
-      let costs = [...dcs]
-      costs.push(doc)
-      setDcs(costs)
+      var fileInput = document.getElementById("myfileinput");
+
+      let auth = "Bearer " + userInfo.token
+
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", auth);
+
+      var formdata = new FormData();
+      formdata.append("doc", fileInput.files[0], fileInput.files[0].name);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      fetch(`http://127.0.0.1:8000/api/techs/docs/${parseInt(match.params.tz_id)}`, requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+      let d = [...docs]
+      d.push(fileInput.files[0].name)
+      setDocs(d)
+
+      alert('Документ добавлен')
     }
      
     return(
@@ -273,12 +329,12 @@ const Tec_upd = ({match}) => {
             </tr>
             <tr>
               <td scope="col">Дата начала сбора КП</td>
-              <td scope="col">{tech.date}</td>
+              <td scope="col">{tech.date?tech.date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Дата завершения сбора КП</td>
               <td scope="col">
-              <input className='cr_input' name='end_date' value={end_date} onChange={(e)=>setEnd_date(e.target.value)} placeholder="ГГГГ-ММ-ДД" placeholder={tech.end_date}></input>
+              <input className='cr_input' name='end_date' value={end_date} onChange={(e)=>setEnd_date(e.target.value)} placeholder="ГГГГ-ММ-ДД" placeholder={tech.end_date?tech.end_date.slice(0,10):''}></input>
                   </td>
             </tr>
             <tr>
@@ -296,16 +352,16 @@ const Tec_upd = ({match}) => {
         </table>
         </div>
           <h5 id="name" className="text-justify">Документация</h5>
-          <div>
-          {docs ? docs.map((item)=>{ return(
-          <p>{item}</p>)
-          }) : <p></p>}
-          {dcs ? dcs.map((item)=>{ return(
-          <p>{item}</p>)
-          }) : <p></p>}
-         </div>
-          <input className='cr_input' value={doc} onChange={(e)=>setDoc(e.target.value)}></input>
-          <button type="button" className="btn btn-outline-dark" onClick={onClickDocs}>Добавить</button>
+          {tech.docs ? tech.docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify"></p>}
+         {docs ? docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify">Документов нет</p>}
+           <input type="file" className="form-control-file" id="myfileinput" onChange={(e)=>setFile(e.target.files[0])}/>
+           <button type="button" className="btn btn-outline-dark m-5" onClick={onClickDocs}>Добавить</button>
 
           <h5 className="text-justify">Описание работ</h5>
           <textarea className='cr_input' name='adress' value={info} onChange={(e)=>setInfo(e.target.value)} placeholder={tech.info}></textarea>
@@ -410,7 +466,7 @@ const Tec_upd = ({match}) => {
                 </select> : <label>Список пуст</label>}
               <input className='cr_input' name='task_name' value={taskCal} onChange={(e)=>setTaskCal(e.target.value)}></input>
         </td>
-        <td><input className='cr_input' name='pay_cond' value={period} onChange={(e)=>setPeriod(e.target.value)}></input></td>
+        <td><input className='cr_input' name='pay_cond' value={period} pattern="[0-9]*" onChange={(e)=>setPeriod(e.target.value)}></input></td>
     
 
         <td colSpan="3"><button type="button" className="btn btn-outline-dark" onClick={onClickCalendars}>Добавить</button></td>

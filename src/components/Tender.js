@@ -207,7 +207,7 @@ const Tec = ({match}) => {
         <th scope="col">Кол-во</th>
         <th scope="col">Единицы измерения</th>
         {tender.cps ? tender.cps.map((item, i)=>{
-        return (<th>{item.org}</th>)}): <p></p>}
+        return (<th><Link to={`/cps/link/${item.cp_id}`}>{item.org}</Link></th>)}): <p></p>}
       </tr>
     </thead>
     <tbody>
@@ -215,11 +215,12 @@ const Tec = ({match}) => {
             <td align='justify'><h5>Наименование операций</h5></td>
         </tr>
       
-      {tender.tz_costs ?  tender.tz_costs.map((item, i)=>{
+      {tender.tz_costs ?  tender.tz_costs.map((item, is)=>{
         return (<tr>
         <td align='justify'>{item.task}</td>
         <td>{item.count}</td>
         <td>{item.metr}</td>
+        {tender.cps ? tender.cps.map((item, i)=>{return (<td>{item.costs[is].cost_sum }</td>)}):<p></p>}
 
         </tr>)}): <p></p>}
         

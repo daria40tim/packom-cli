@@ -1,4 +1,4 @@
-import {ORG_LIST_FAIL, ORG_LIST_SUCCESS, ORG_LIST_REQUEST, ORG_FAIL, ORG_REQUEST, ORG_SUCCESS, ORG_LIST_SORTEDBY_NAME, ORG_LIST_SORTEDBY_GROUP, ORG_LIST_SORT_FAIL, ORG_LIST_SORTEDBY_SPEC, ORG_LIST_SORTEDBY_COUNTRY, ORG_UPDATE_REQUEST, ORG_UPDATE_SUCCESS, ORG_UPDATE_FAIL, ADD_ORG_REQUEST, ADD_ORG_SUCCESS, ADD_ORG_FAIL} from '../constants/orgConstants'
+import {ORG_LIST_FAIL, ORG_LIST_SUCCESS, ORG_LIST_REQUEST, ORG_FAIL, ORG_REQUEST, ORG_SUCCESS, ORG_LIST_SORTEDBY_NAME, ORG_LIST_SORTEDBY_GROUP, ORG_LIST_SORT_FAIL, ORG_LIST_SORTEDBY_SPEC, ORG_LIST_SORTEDBY_COUNTRY, ORG_UPDATE_REQUEST, ORG_UPDATE_SUCCESS, ORG_UPDATE_FAIL, ADD_ORG_REQUEST, ADD_ORG_SUCCESS, ADD_ORG_FAIL, ADD_ORG_DOC_REQUEST, ADD_ORG_DOC_SUCCESS, ADD_ORG_DOC_FAIL, DOWN_ORG_DOC_REQUEST, DOWN_ORG_DOC_SUCCESS, DOWN_ORG_DOC_FAIL} from '../constants/orgConstants'
 
 export const orgListReducer = (state = {orgs: []}, action) => {
     switch (action.type) {
@@ -68,3 +68,30 @@ export const orgAddReducer = (state = {}, action) => {
             return state
     }
 }
+
+export const orgAddDocReducer = (state = {}, action) => {
+    switch (action.type) {
+        case ADD_ORG_DOC_REQUEST:
+            return {loading: true }
+        case ADD_ORG_DOC_SUCCESS:
+            return {loading: false, success: action.payload}
+        case ADD_ORG_DOC_FAIL:
+            return {loading: false, success: false, error: action.payload}
+        default: 
+            return state
+    }
+}
+
+export const orgDownDocReducer = (state = {}, action) => {
+    switch (action.type) {
+        case DOWN_ORG_DOC_REQUEST:
+            return {loading: true }
+        case DOWN_ORG_DOC_SUCCESS:
+            return {loading: false, success: action.payload}
+        case DOWN_ORG_DOC_FAIL:
+            return {loading: false, success: false, error: action.payload}
+        default: 
+            return state
+    }
+}
+

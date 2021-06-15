@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
-import { listCPDetails } from '../actions/cpAction';
+import { listCPDetails, listCpDownDoc } from '../actions/cpAction';
 
 
 Date.prototype.getWeek = function() {
@@ -23,6 +23,12 @@ const One_CP = ({match}) =>  {
 
   const cpDetails = useSelector(state => state.cpDetails)
   const {loading, error, cp} = cpDetails
+
+  const onClickDownload = (e) => {
+    console.log(e.target.id)
+    dispatch(listCpDownDoc(cp.docs[e.target.id], parseInt(match.params.cp_id)))
+  }
+
 
   useEffect(() => {
     dispatch(listCPDetails(match.params.cp_id))
@@ -53,22 +59,22 @@ const One_CP = ({match}) =>  {
             <tr>
               <td scope="col">Клиент</td>
               <td scope="col">
-              <Link to={`/orgs/link/${cp.tz_o_id}`} >
+              { cp ? <Link to={`/orgs/link/${cp.tz_o_id}`} >
                   {cp.client}
-                </Link>
+                </Link> : <p></p>}
                   </td>
             </tr>
             <tr>
               <td scope="col">Проект</td>
-              <td scope="col">{cp.proj}</td>
+              <td scope="col">{cp ? cp.proj:''}</td>
             </tr>
             <tr>
               <td scope="col">Группа упаковки</td>
-              <td scope="col">{cp.group}</td>
+              <td scope="col">{cp ? cp.group : ''}</td>
             </tr>
             <tr>
               <td scope="col">Тип упаковки</td>
-              <td scope="col">{cp.type}</td>
+              <td scope="col">{cp ? cp.type: ''}</td>
             </tr>
             <tr>
               <td scope="col">Вид упаковки</td>
@@ -84,11 +90,11 @@ const One_CP = ({match}) =>  {
             </tr>
             <tr>
               <td scope="col">Дата начала сбора КП</td>
-              <td scope="col">{cp.tz_date}</td>
+              <td scope="col">{cp.tz_date ? cp.tz_date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Дата завершения сбора КП</td>
-              <td scope="col">{cp.tz_end_date}</td>
+              <td scope="col">{cp.tz_end_date ? cp.tz_end_date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Доступ к данным ТЗ</td>
@@ -156,11 +162,11 @@ const One_CP = ({match}) =>  {
             </tr>
             <tr>
               <td scope="col">Дата предоставления КП</td>
-              <td scope="col">{cp.date}</td>
+              <td scope="col">{cp.date ? cp.date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Срок действия КП</td>
-              <td scope="col">{cp.end_date}</td>
+              <td scope="col">{cp.end_date ? cp.end_date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Статус КП</td>
@@ -176,9 +182,9 @@ const One_CP = ({match}) =>  {
               <td scope="col" colSpan="2"><h5>Документация от поставщика</h5></td>
             </tr>
             <tr>
-              <td scope="col" colSpan="2">{cp.docs ? cp.docs.map((item, i)=>{
+              <td scope="col" colSpan="2"> {cp.docs ? cp.docs.map((item, i)=>{
         return (
-          <p className="text-justify">{item}</p>
+          <button className="btn" onClick={onClickDownload} id={i}>{item}</button>
        )}) : <p className="text-justify">Документов нет</p>}
        </td>
             </tr>

@@ -1,7 +1,8 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {withRouter} from 'react-router-dom';
-import {listOrgDetails, listOrgDetailsUpdate} from '../actions/orgAction'
+import {Prompt, useHistory, withRouter} from 'react-router-dom';
+import {listOrgAddDoc, listOrgDetails, listOrgDetailsUpdate} from '../actions/orgAction'
+import { listSpecs } from '../actions/selectAction';
 import Loader from './Loader';
 import Message from './Message';
 let data = 
@@ -66,46 +67,140 @@ const Ord_update = ({match}) => {
   //const { success } = orgUpdateDetails
 
   useEffect(() => {
-    dispatch(listOrgDetails(match.params.o_id))
-  }, [dispatch, match])
+    dispatch(listOrgDetails(match.params.o_id))}, [dispatch, match])
+
+  const specsList = useSelector(state => state.specsList)
+
+  useEffect(() => {dispatch(listSpecs())}, [dispatch])
+
+  const {data} = specsList
 
  /* constructor(props) {
     super(props);
         this.onClick = this.onClick.bind(this)
     }*/
+    const history = useHistory();
 
-    const [adress, setAdress] = useState(org.adress)
-    const [phone, setPhone] = useState(org.phone)
-    const [email, setEmail] = useState(org.email)
-    const [site, setSite] = useState(org.site)
-    const [spec, setSpec] = useState(org.spec)
+    const [adress, setAdress] = useState("")
+    const [phone, setPhone] = useState("")
+    const [email, setEmail] = useState("")
+    const [site, setSite] = useState("")
+    const [spec, setSpec] = useState("")
     const [password, setPassword] = useState('')
     const [old_password, setOldPassword] = useState('')
-    const [info, setInfo] = useState(org.info)
+    const [info, setInfo] = useState("")
+    const [file, setFile] = useState()
+    const [docs, setDocs] = useState([])
+    
+    
+    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
 
+    const onClickDocs= (e) => {
+      /*let data = new FormData()
+      data.append('doc', file)
+      dispatch(listOrgAddDoc(data))
+      console.log(1)*/
+      var fileInput = document.getElementById("myfileinput");
 
-    let onClickSave= () => {
-        let a = ''
-        adress ? a = adress : a = org.adress
-        let p = ''
-        phone ? p = phone : p = org.phone
-        let e = ''
-        email ? e = email : e = org.email
-        let s = ''
-        site ? s = site : s = org.site
-        let sp = ''
-        spec ? sp = spec : sp = org.spec
-        let i = ''
-        info ? i = info : i = org.info
-        let ps = ''
-        password ? ps = password : ps = old_password
-        dispatch(listOrgDetailsUpdate(a, p, e, s, sp, password, i))
+      let auth = "Bearer " + userInfo.token
+
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", auth);
+
+      var formdata = new FormData();
+      formdata.append("doc", fileInput.files[0], fileInput.files[0].name);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+      };
+
+      fetch("http://127.0.0.1:8000/api/orgs/docs", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+      let d = [...docs]
+      d.push(fileInput.files[0].name)
+      setDocs(d)
+
+      alert('Документ добавлен')
+  }
+
+  const onClickCancel = ()=>{
+    history.push(`/orgs/`)
+  }
+
+    const onClickSave= () => {
+      if (password != old_password){
+        alert('Пароли не совпадают')
+        return
+      }
+      let hi = ''
+        let adress_ = ''
+        if (adress != ''){ 
+            adress_ = adress
+            hi = hi + " \n Изменен адрес: " + adress_ + " Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            adress_ = org.adress
+        }
+        let password_ = ''
+        if (password != ''){ 
+            password_ = password
+            hi = hi + " \n Изменен пароль. Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            password_ = ""
+        }
+        let phone_ = ''
+        if (phone != ''){ 
+            phone_ = phone
+            hi = hi + " \n Изменен телефон: " + phone_ + " Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            phone_ = org.phone
+        }
+        let email_ = ''
+        if (email != ''){ 
+            email_ = email
+            hi = hi + " \n Изменен адрес электронной почты: " + email_ + " Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            email_ = org.email
+        }
+        let site_ = ''
+        if (site != ''){ 
+            site_ = site
+            hi = hi + " \n Изменен сайт: " + site_ + " Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            site_ = org.site
+        }
+        let spec_ = ''
+        if (spec != ''){ 
+            spec_ = spec
+            hi = hi + " \n Изменена специализация: " + spec_ + " Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            spec_ = org.spec
+        }
+        let info_ = ''
+        if (info != ''){ 
+            info_ = info
+            hi = hi + " \n Изменена общая информация: " + info_ + " Дата: " + new Date().toISOString().slice(0, 10)
+        }else {
+            info_ = org.info
+        }
+        console.log(hi)
+        hi = hi+" "+org.history
+        dispatch(listOrgDetailsUpdate(adress_, phone_, email_, site_, spec_, password_, info_, hi))
+        history.push(`/orgs/`)
      }
 
   //render() {
     return(
         <div>
-       
+        <Prompt
+      when={true}
+      message='Все несохраненные изменения удалятся. Вы уверены, что хотите покинуть страницу?'
+    />
           {loading ? <Loader/>: error ? <Message variant="danger">{error}</Message> :
           <div>
         <h4 id="name" className="text-center">{org.name}</h4>
@@ -135,7 +230,7 @@ const Ord_update = ({match}) => {
             </tr>
             <tr>
               <td scope="col">Логин</td>
-              <td scope="col">{org.email}</td>
+              <td scope="col">{org.login}</td>
             </tr>
             <tr>
               <td scope="col">Адрес</td>
@@ -161,26 +256,28 @@ const Ord_update = ({match}) => {
               <input className='cr_input' value={site} name='site' onChange={(e)=>setSite(e.target.value)} placeholder={org.site}></input>
                   </td>
             </tr>
-            <tr>
+            {userInfo.group_id =="2" || userInfo.group_id =="3" ? <tr>
               <td scope="col">Специализация</td>
               <td scope="col">
-              <input className='cr_input' value={spec} name='spec' onChange={(e)=>setSpec(e.target.value)} placeholder={org.spec}></input>
+              <label>Выберите из списка</label>
+                {data.specs ? 
+              <select className="form-select cr_input" name="dir" id="selector" value={spec} onChange={(e)=>setSpec(e.target.value)} placeholder='Не выбрано'>
+                {data.specs.map((item, i) => { return(
+                <option value={item}>{item}</option>
+                )})}
+                </select> : <label>Список пуст</label>}
               </td>
-            </tr>
-            <tr>
-              <td scope="col" colSpan='2'><h5>
-                  Для подтверждения изменений введите старый пароль</h5></td>
-            </tr>
-            <tr>
-              <td scope="col">Пароль</td>
-              <td scope="col">
-              <input className='cr_input' value={old_password} name='password' type='password' onChange={(e)=>setOldPassword(e.target.value)}></input>
-              </td>
-            </tr>
+            </tr>:<p></p>}
             <tr>
               <td scope="col">Новый пароль</td>
               <td scope="col">
-              <input className='cr_input' value={password} name='password' onChange={(e)=>setPassword(e.target.value)}></input>
+              <input type='password' className='cr_input' value={password} name='password' onChange={(e)=>setPassword(e.target.value)}></input>
+              </td>
+            </tr>
+            <tr>
+              <td scope="col">Подтвердите пароль</td>
+              <td scope="col">
+              <input type='password' className='cr_input' value={old_password} name='password' onChange={(e)=>setOldPassword(e.target.value)}></input>
               </td>
             </tr>
           </tbody>
@@ -190,7 +287,13 @@ const Ord_update = ({match}) => {
           {org.docs ? org.docs.map((item, i)=>{
         return (
           <p className="text-justify">{item}</p>
+       )}) : <p className="text-justify"></p>}
+         {docs ? docs.map((item, i)=>{
+        return (
+          <p className="text-justify">{item}</p>
        )}) : <p className="text-justify">Документов нет</p>}
+           <input type="file" className="form-control-file" id="myfileinput" onChange={(e)=>setFile(e.target.files[0])}/>
+           <button type="button" className="btn btn-outline-dark m-5" onClick={onClickDocs}>Добавить</button>
 
           <h5 className="text-justify">О компании</h5>
           <div>
@@ -199,6 +302,7 @@ const Ord_update = ({match}) => {
 </div>
 }
 <button type="button" className="btn btn-outline-dark m-5" onClick={onClickSave}>Сохранить изменения</button>
+<button type="button" className="btn btn-outline-dark m-5" onClick={onClickCancel}>Отменить</button>
 </div>
 )
   }

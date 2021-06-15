@@ -81,6 +81,8 @@ const C = () => {
     dispatch(sortCPByOrg(cps, o_idFlag))
     setOrgFlag(!o_idFlag)
   }
+
+  
   const [tz_idFlag, setTzIdFlag] = useState(true)
   const [dateFlag, setDateFlag] = useState(true)
   const [cp_idFlag, setCpIdFlag] = useState(true)

@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Link, useHistory, withRouter} from 'react-router-dom';
-import { listTechDetails } from '../actions/tzAction';
+import { listTechDetails, listTzDownDoc } from '../actions/tzAction';
 import Loader from './Loader';
 import Message from './Message';
 /*let data = 
@@ -65,6 +65,8 @@ const Tec = ({match}) => {
 
   const [cal, setCal] = useState([])
   const [cps, setCps] = useState([])
+  const [date, setDate] = useState('')
+  const [end_date, setEndDate] = useState('')
   let last = 0
 
 
@@ -73,9 +75,13 @@ const Tec = ({match}) => {
   }, [dispatch, match])
 
   useEffect(() => {
+    //let d = tech.date.toISOString().slice(0, 10)
     setCal(tech.cal)
     setCps(data.cps)
+    //setDate(d)
+    //setEndDate(new Date(tech.end_date).toISOString().slice(0, 10))
 })
+
   
   const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
 
@@ -93,6 +99,12 @@ const Tec = ({match}) => {
     let onClickUpdate = (e) => {
       history.push(`/techs/upd/${match.params.tz_id}`)
      }
+
+     const onClickDownload = (e) => {
+      console.log(e.target.id)
+      dispatch(listTzDownDoc(tech.docs[e.target.id], parseInt(match.params.tz_id)))
+    }
+  
     
     return(
         <div>
@@ -142,15 +154,15 @@ const Tec = ({match}) => {
             </tr>
             <tr>
               <td scope="col">Дата начала сбора КП</td>
-              <td scope="col">{tech.date}</td>
+              <td scope="col">{tech.date ? tech.date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Дата завершения сбора КП</td>
-              <td scope="col">{tech.end_date}</td>
+              <td scope="col">{tech.end_date ? tech.end_date.slice(0,10):''}</td>
             </tr>
             <tr>
               <td scope="col">Доступ к данным ТЗ</td>
-              <td scope="col">{ tech.privacy ? "Для доверенных поставщиков" : "Открыт"}</td>
+              <td scope="col">{ tech.privacy=='true' ? "Для доверенных поставщиков" : "Открыт"}</td>
             </tr>
             <tr>
               <td scope="col">Статус ТЗ</td>
@@ -162,7 +174,7 @@ const Tec = ({match}) => {
           <h5 id="name" className="text-justify">Документация</h5>
           {tech.docs ? tech.docs.map((item, i)=>{
         return (
-          <p className="text-justify">{item}</p>
+          <button className="btn" onClick={onClickDownload} id={i}>{item}</button>
        )}) : <p className="text-justify">Документов нет</p>}
           
           {Date.parse(tech.end_date)> Date.now() ? userInfo.o_id == tech.o_id ? 
